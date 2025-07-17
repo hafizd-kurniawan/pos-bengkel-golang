@@ -81,6 +81,15 @@ func NewRepositoryManager(db *gorm.DB) *RepositoryManager {
 		ServiceDetail:     implementations.NewServiceDetailRepository(db),
 		ServiceJobHistory: implementations.NewServiceJobHistoryRepository(db),
 
+		// Transactions
+		Transaction:           implementations.NewTransactionRepository(db),
+		TransactionDetail:     implementations.NewTransactionDetailRepository(db),
+
+		// Financial
+		PaymentMethod:       implementations.NewPaymentMethodRepository(db),
+		Payment:             implementations.NewPaymentRepository(db),
+		CashFlow:            implementations.NewCashFlowRepository(db),
+
 		// Add other repositories as they are implemented
 	}
 }

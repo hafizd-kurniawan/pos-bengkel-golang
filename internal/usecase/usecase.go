@@ -32,6 +32,15 @@ type UsecaseManager struct {
 	ServiceDetail     interfaces.ServiceDetailUsecase
 	ServiceJobHistory interfaces.ServiceJobHistoryUsecase
 
+	// Transactions
+	Transaction       interfaces.TransactionUsecase
+	TransactionDetail interfaces.TransactionDetailUsecase
+
+	// Financial
+	PaymentMethod interfaces.PaymentMethodUsecase
+	Payment       interfaces.PaymentUsecase
+	CashFlow      interfaces.CashFlowUsecase
+
 	// Add other usecases as they are implemented
 }
 
@@ -61,6 +70,15 @@ func NewUsecaseManager(repo *repository.RepositoryManager) *UsecaseManager {
 		ServiceJob:        implementations.NewServiceJobUsecase(repo),
 		ServiceDetail:     implementations.NewServiceDetailUsecase(repo),
 		ServiceJobHistory: implementations.NewServiceJobHistoryUsecase(repo),
+
+		// Transactions
+		Transaction:       implementations.NewTransactionUsecase(repo),
+		TransactionDetail: implementations.NewTransactionDetailUsecase(repo),
+
+		// Financial
+		PaymentMethod: implementations.NewPaymentMethodUsecase(repo),
+		Payment:       implementations.NewPaymentUsecase(repo),
+		CashFlow:      implementations.NewCashFlowUsecase(repo),
 
 		// Add other usecases as they are implemented
 	}

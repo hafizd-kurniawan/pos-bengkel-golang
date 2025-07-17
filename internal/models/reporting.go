@@ -33,7 +33,7 @@ type Promotion struct {
 	PromotionName string         `gorm:"size:255;not null" json:"promotion_name"`
 	StartDate     time.Time      `gorm:"not null" json:"start_date"`
 	EndDate       time.Time      `gorm:"not null" json:"end_date"`
-	Type          string         `gorm:"type:enum('percentage','fixed');not null" json:"type"`
+	Type          PromotionType  `gorm:"not null" json:"type"`
 	Value         float64        `gorm:"type:decimal(15,2);not null" json:"value"`
 	CreatedAt     time.Time      `json:"created_at"`
 	UpdatedAt     time.Time      `json:"updated_at"`

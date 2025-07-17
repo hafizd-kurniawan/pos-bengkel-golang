@@ -63,8 +63,10 @@ func NewRepositoryManager(db *gorm.DB) *RepositoryManager {
 		Role:       implementations.NewRoleRepository(db),
 		Permission: implementations.NewPermissionRepository(db),
 
+		// Customer & Vehicle
+		Customer:        implementations.NewCustomerRepository(db),
+		CustomerVehicle: implementations.NewCustomerVehicleRepository(db),
+
 		// Add other repositories as they are implemented
-		// For now, we'll only implement the foundation repositories
-		// to keep the commit manageable
 	}
 }

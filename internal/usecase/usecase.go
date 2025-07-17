@@ -14,6 +14,10 @@ type UsecaseManager struct {
 	Role       interfaces.RoleUsecase
 	Permission interfaces.PermissionUsecase
 
+	// Customer & Vehicle
+	Customer        interfaces.CustomerUsecase
+	CustomerVehicle interfaces.CustomerVehicleUsecase
+
 	// Add other usecases as they are implemented
 }
 
@@ -25,6 +29,10 @@ func NewUsecaseManager(repo *repository.RepositoryManager) *UsecaseManager {
 		Outlet: implementations.NewOutletUsecase(repo),
 		// Role:       implementations.NewRoleUsecase(repo),
 		// Permission: implementations.NewPermissionUsecase(repo),
+
+		// Customer & Vehicle
+		Customer:        implementations.NewCustomerUsecase(repo),
+		CustomerVehicle: implementations.NewCustomerVehicleUsecase(repo),
 
 		// Add other usecases as they are implemented
 	}

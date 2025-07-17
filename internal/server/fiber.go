@@ -50,6 +50,7 @@ func Run(conf *config.Config, dbList *db.DatabaseList, appLoger *logrus.Logger) 
 	
 	// Setup new routes
 	routes.SetupFoundationRoutes(app, usecaseManager)
+	routes.SetupCustomerRoutes(app, usecaseManager)
 	
 	// Health check endpoint
 	app.Get("/health", func(c *fiber.Ctx) error {

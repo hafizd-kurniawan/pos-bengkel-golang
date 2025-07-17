@@ -70,6 +70,36 @@ type PermissionResponse struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+// CustomerResponse represents customer data in API response
+type CustomerResponse struct {
+	CustomerID  uint              `json:"customer_id"`
+	Name        string            `json:"name"`
+	PhoneNumber string            `json:"phone_number"`
+	Address     *string           `json:"address"`
+	Status      models.StatusUmum `json:"status"`
+	Vehicles    []CustomerVehicleResponse `json:"vehicles,omitempty"`
+	CreatedAt   time.Time         `json:"created_at"`
+	UpdatedAt   time.Time         `json:"updated_at"`
+}
+
+// CustomerVehicleResponse represents customer vehicle data in API response
+type CustomerVehicleResponse struct {
+	VehicleID      uint              `json:"vehicle_id"`
+	CustomerID     uint              `json:"customer_id"`
+	PlateNumber    string            `json:"plate_number"`
+	Brand          string            `json:"brand"`
+	Model          string            `json:"model"`
+	Type           string            `json:"type"`
+	ProductionYear int               `json:"production_year"`
+	ChassisNumber  string            `json:"chassis_number"`
+	EngineNumber   string            `json:"engine_number"`
+	Color          string            `json:"color"`
+	Notes          *string           `json:"notes"`
+	Customer       *CustomerResponse `json:"customer,omitempty"`
+	CreatedAt      time.Time         `json:"created_at"`
+	UpdatedAt      time.Time         `json:"updated_at"`
+}
+
 // Helper functions to convert models to responses
 func ToUserResponse(user *models.User) *UserResponse {
 	response := &UserResponse{
@@ -126,4 +156,56 @@ func ToPermissionResponse(permission *models.Permission) *PermissionResponse {
 		CreatedAt: permission.CreatedAt,
 		UpdatedAt: permission.UpdatedAt,
 	}
+}
+
+func ToCustomerResponse(customer *models.Customer) *CustomerResponse {
+	response := &CustomerResponse{
+		CustomerID:  customer.CustomerID,
+		Name:        customer.Name,
+		PhoneNumber: customer.PhoneNumber,
+		Address:     customer.Address,
+		Status:      customer.Status,
+		CreatedAt:   customer.CreatedAt,
+		UpdatedAt:   customer.UpdatedAt,
+	}
+
+	if customer.Vehicles != nil {
+		for _, vehicle := range customer.Vehicles {
+			response.Vehicles = append(response.Vehicles, *ToCustomerVehicleResponse(&vehicle))
+		}
+	}
+
+	return response
+}
+
+func ToCustomerVehicleResponse(vehicle *models.CustomerVehicle) *CustomerVehicleResponse {
+	response := &CustomerVehicleResponse{
+		VehicleID:      vehicle.VehicleID,
+		CustomerID:     vehicle.CustomerID,
+		PlateNumber:    vehicle.PlateNumber,
+		Brand:          vehicle.Brand,
+		Model:          vehicle.Model,
+		Type:           vehicle.Type,
+		ProductionYear: vehicle.ProductionYear,
+		ChassisNumber:  vehicle.ChassisNumber,
+		EngineNumber:   vehicle.EngineNumber,
+		Color:          vehicle.Color,
+		Notes:          vehicle.Notes,
+		CreatedAt:      vehicle.CreatedAt,
+		UpdatedAt:      vehicle.UpdatedAt,
+	}
+
+	if vehicle.Customer != nil {
+		response.Customer = &CustomerResponse{
+			CustomerID:  vehicle.Customer.CustomerID,
+			Name:        vehicle.Customer.Name,
+			PhoneNumber: vehicle.Customer.PhoneNumber,
+			Address:     vehicle.Customer.Address,
+			Status:      vehicle.Customer.Status,
+			CreatedAt:   vehicle.Customer.CreatedAt,
+			UpdatedAt:   vehicle.Customer.UpdatedAt,
+		}
+	}
+
+	return response
 }

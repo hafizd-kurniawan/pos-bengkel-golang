@@ -365,6 +365,54 @@ Get outlet by ID.
 }
 ```
 
+#### PUT /api/v1/outlets/:id
+Update outlet information.
+
+**Path Parameters:**
+- `id`: Outlet ID
+
+**Request Body:**
+```json
+{
+  "outlet_name": "Main Workshop - Updated",
+  "address": "Jl. Merdeka No. 123 - Updated",
+  "phone_number": "021-87654321"
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Outlet updated successfully",
+  "data": {
+    "outlet_id": 1,
+    "outlet_name": "Main Workshop - Updated",
+    "branch_type": "Pusat",
+    "city": "Jakarta",
+    "address": "Jl. Merdeka No. 123 - Updated",
+    "phone_number": "021-87654321",
+    "status": "Aktif",
+    "created_at": "2024-01-01T10:00:00Z",
+    "updated_at": "2024-01-01T11:00:00Z"
+  }
+}
+```
+
+#### DELETE /api/v1/outlets/:id
+Delete outlet (soft delete).
+
+**Path Parameters:**
+- `id`: Outlet ID
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Outlet deleted successfully"
+}
+```
+
 ---
 
 ## Customer Management APIs
@@ -549,6 +597,29 @@ Search customers by name or phone number.
 }
 ```
 
+#### GET /api/v1/customers/phone
+Get customer by phone number.
+
+**Query Parameters:**
+- `phone_number`: Customer phone number
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Customer retrieved successfully",
+  "data": {
+    "customer_id": 1,
+    "name": "John Doe",
+    "phone_number": "081234567890",
+    "address": "Jl. Sudirman No. 456",
+    "status": "Aktif",
+    "created_at": "2024-01-01T10:00:00Z",
+    "updated_at": "2024-01-01T10:00:00Z"
+  }
+}
+```
+
 ### Customer Vehicles
 
 #### POST /api/v1/customer-vehicles
@@ -653,11 +724,137 @@ List all customer vehicles with pagination.
 }
 ```
 
-#### GET /api/v1/customers/:id/vehicles
+#### GET /api/v1/customer-vehicles/:id
+Get customer vehicle by ID.
+
+**Path Parameters:**
+- `id`: Vehicle ID
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Customer vehicle retrieved successfully",
+  "data": {
+    "vehicle_id": 1,
+    "customer_id": 1,
+    "plate_number": "B1234XYZ",
+    "brand": "Toyota",
+    "model": "Avanza",
+    "type": "MPV",
+    "production_year": 2020,
+    "chassis_number": "CH1234567890123456",
+    "engine_number": "ENG1234567890",
+    "color": "Silver",
+    "notes": "Customer vehicle in good condition",
+    "customer": {
+      "customer_id": 1,
+      "name": "John Doe",
+      "phone_number": "081234567890"
+    },
+    "created_at": "2024-01-01T10:00:00Z",
+    "updated_at": "2024-01-01T10:00:00Z"
+  }
+}
+```
+
+#### PUT /api/v1/customer-vehicles/:id
+Update customer vehicle information.
+
+**Path Parameters:**
+- `id`: Vehicle ID
+
+**Request Body:**
+```json
+{
+  "model": "Avanza Veloz",
+  "color": "Black",
+  "notes": "Customer vehicle upgraded to Veloz variant"
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Customer vehicle updated successfully",
+  "data": {
+    "vehicle_id": 1,
+    "customer_id": 1,
+    "plate_number": "B1234XYZ",
+    "brand": "Toyota",
+    "model": "Avanza Veloz",
+    "type": "MPV",
+    "production_year": 2020,
+    "chassis_number": "CH1234567890123456",
+    "engine_number": "ENG1234567890",
+    "color": "Black",
+    "notes": "Customer vehicle upgraded to Veloz variant",
+    "created_at": "2024-01-01T10:00:00Z",
+    "updated_at": "2024-01-01T11:00:00Z"
+  }
+}
+```
+
+#### DELETE /api/v1/customer-vehicles/:id
+Delete customer vehicle (soft delete).
+
+**Path Parameters:**
+- `id`: Vehicle ID
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Customer vehicle deleted successfully"
+}
+```
+
+#### GET /api/v1/customer-vehicles/search
+Search customer vehicles by plate number, brand, or model.
+
+**Query Parameters:**
+- `q`: Search query (plate number, brand, model)
+- `page` (optional): Page number (default: 1)
+- `limit` (optional): Items per page (default: 10)
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Customer vehicles found",
+  "data": [
+    {
+      "vehicle_id": 1,
+      "customer_id": 1,
+      "plate_number": "B1234XYZ",
+      "brand": "Toyota",
+      "model": "Avanza",
+      "type": "MPV",
+      "production_year": 2020,
+      "customer": {
+        "customer_id": 1,
+        "name": "John Doe",
+        "phone_number": "081234567890"
+      },
+      "created_at": "2024-01-01T10:00:00Z",
+      "updated_at": "2024-01-01T10:00:00Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 1,
+    "pages": 1
+  }
+}
+```
+
+#### GET /api/v1/customers/:customer_id/vehicles
 Get all vehicles for a specific customer.
 
 **Path Parameters:**
-- `id`: Customer ID
+- `customer_id`: Customer ID
 
 **Response:**
 ```json
@@ -771,6 +968,49 @@ Get category by ID.
 }
 ```
 
+#### PUT /api/v1/categories/:id
+Update category information.
+
+**Path Parameters:**
+- `id`: Category ID
+
+**Request Body:**
+```json
+{
+  "name": "Spare Parts - Updated",
+  "status": "Aktif"
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Category updated successfully",
+  "data": {
+    "category_id": 1,
+    "name": "Spare Parts - Updated",
+    "status": "Aktif",
+    "created_at": "2024-01-01T10:00:00Z",
+    "updated_at": "2024-01-01T11:00:00Z"
+  }
+}
+```
+
+#### DELETE /api/v1/categories/:id
+Delete category (soft delete).
+
+**Path Parameters:**
+- `id`: Category ID
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Category deleted successfully"
+}
+```
+
 #### GET /api/v1/categories/:id/products
 Get all products in a category.
 
@@ -837,6 +1077,111 @@ List all suppliers with pagination.
 {
   "status": "success",
   "message": "Suppliers retrieved successfully",
+  "data": [
+    {
+      "supplier_id": 1,
+      "supplier_name": "PT Auto Parts Indonesia",
+      "contact_person_name": "Budi Santoso",
+      "phone_number": "021-87654321",
+      "address": "Jl. Industri No. 45, Jakarta",
+      "status": "Aktif",
+      "created_at": "2024-01-01T10:00:00Z",
+      "updated_at": "2024-01-01T10:00:00Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 1,
+    "pages": 1
+  }
+}
+```
+
+#### GET /api/v1/suppliers/:id
+Get supplier by ID.
+
+**Path Parameters:**
+- `id`: Supplier ID
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Supplier retrieved successfully",
+  "data": {
+    "supplier_id": 1,
+    "supplier_name": "PT Auto Parts Indonesia",
+    "contact_person_name": "Budi Santoso",
+    "phone_number": "021-87654321",
+    "address": "Jl. Industri No. 45, Jakarta",
+    "status": "Aktif",
+    "created_at": "2024-01-01T10:00:00Z",
+    "updated_at": "2024-01-01T10:00:00Z"
+  }
+}
+```
+
+#### PUT /api/v1/suppliers/:id
+Update supplier information.
+
+**Path Parameters:**
+- `id`: Supplier ID
+
+**Request Body:**
+```json
+{
+  "supplier_name": "PT Auto Parts Indonesia - Updated",
+  "contact_person_name": "Budi Santoso Updated",
+  "phone_number": "021-11111111"
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Supplier updated successfully",
+  "data": {
+    "supplier_id": 1,
+    "supplier_name": "PT Auto Parts Indonesia - Updated",
+    "contact_person_name": "Budi Santoso Updated",
+    "phone_number": "021-11111111",
+    "address": "Jl. Industri No. 45, Jakarta",
+    "status": "Aktif",
+    "created_at": "2024-01-01T10:00:00Z",
+    "updated_at": "2024-01-01T11:00:00Z"
+  }
+}
+```
+
+#### DELETE /api/v1/suppliers/:id
+Delete supplier (soft delete).
+
+**Path Parameters:**
+- `id`: Supplier ID
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Supplier deleted successfully"
+}
+```
+
+#### GET /api/v1/suppliers/search
+Search suppliers by name or contact person.
+
+**Query Parameters:**
+- `q`: Search query
+- `page` (optional): Page number (default: 1)
+- `limit` (optional): Items per page (default: 10)
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Suppliers found",
   "data": [
     {
       "supplier_id": 1,
@@ -927,6 +1272,70 @@ List all unit types.
       "updated_at": "2024-01-01T10:00:00Z"
     }
   ]
+}
+```
+
+#### GET /api/v1/unit-types/:id
+Get unit type by ID.
+
+**Path Parameters:**
+- `id`: Unit Type ID
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Unit type retrieved successfully",
+  "data": {
+    "unit_type_id": 1,
+    "name": "Pieces",
+    "status": "Aktif",
+    "created_at": "2024-01-01T10:00:00Z",
+    "updated_at": "2024-01-01T10:00:00Z"
+  }
+}
+```
+
+#### PUT /api/v1/unit-types/:id
+Update unit type information.
+
+**Path Parameters:**
+- `id`: Unit Type ID
+
+**Request Body:**
+```json
+{
+  "name": "Pieces - Updated",
+  "status": "Aktif"
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Unit type updated successfully",
+  "data": {
+    "unit_type_id": 1,
+    "name": "Pieces - Updated",
+    "status": "Aktif",
+    "created_at": "2024-01-01T10:00:00Z",
+    "updated_at": "2024-01-01T11:00:00Z"
+  }
+}
+```
+
+#### DELETE /api/v1/unit-types/:id
+Delete unit type (soft delete).
+
+**Path Parameters:**
+- `id`: Unit Type ID
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Unit type deleted successfully"
 }
 ```
 
@@ -1133,6 +1542,60 @@ Get product by SKU.
 }
 ```
 
+#### GET /api/v1/products/barcode
+Get product by barcode.
+
+**Query Parameters:**
+- `barcode`: Product barcode
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Product retrieved successfully",
+  "data": {
+    "product_id": 1,
+    "product_name": "Brake Pad Toyota Avanza",
+    "sku": "BP-TOY-AVZ-001",
+    "barcode": "1234567890123",
+    "selling_price": 200000,
+    "stock": 25
+  }
+}
+```
+
+#### GET /api/v1/products/usage-status
+Get products by usage status.
+
+**Query Parameters:**
+- `status`: Usage status (e.g., "Jual", "Pakai", "Jual&Pakai")
+- `page` (optional): Page number (default: 1)
+- `limit` (optional): Items per page (default: 10)
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Products retrieved successfully",
+  "data": [
+    {
+      "product_id": 1,
+      "product_name": "Brake Pad Toyota Avanza",
+      "sku": "BP-TOY-AVZ-001",
+      "selling_price": 200000,
+      "stock": 25,
+      "usage_status": "Jual"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 1,
+    "pages": 1
+  }
+}
+```
+
 #### GET /api/v1/products/search
 Search products by name or SKU.
 
@@ -1323,6 +1786,20 @@ Update service category.
 }
 ```
 
+#### DELETE /api/v1/service-categories/:id
+Delete service category (soft delete).
+
+**Path Parameters:**
+- `id`: Service Category ID
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Service category deleted successfully"
+}
+```
+
 #### GET /api/v1/service-categories/:id/services
 Get all services in a category.
 
@@ -1485,6 +1962,20 @@ Update service information.
 }
 ```
 
+#### DELETE /api/v1/services/:id
+Delete service (soft delete).
+
+**Path Parameters:**
+- `id`: Service ID
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Service deleted successfully"
+}
+```
+
 #### GET /api/v1/services/code
 Get service by code.
 
@@ -1536,6 +2027,560 @@ Search services by name or code.
     "total": 1,
     "pages": 1
   }
+}
+```
+
+---
+
+## Service Job Management APIs
+
+The Service Job Management system handles the complete workflow of automotive service operations, from job creation to completion tracking.
+
+### Service Jobs
+
+#### POST /api/v1/service-jobs
+Create a new service job.
+
+**Request Body:**
+```json
+{
+  "service_code": "SJ-2024-001",
+  "customer_id": 1,
+  "vehicle_id": 1,
+  "user_id": 1,
+  "outlet_id": 1,
+  "service_date": "2024-01-01T09:00:00Z",
+  "complaint": "Engine making strange noise",
+  "diagnosis": "Need oil change and engine inspection",
+  "estimated_cost": 500000,
+  "status": "Pending",
+  "notes": "Customer priority service"
+}
+```
+
+**Validation Rules:**
+- `service_code`: required, unique
+- `customer_id`: required, must exist in customers table
+- `vehicle_id`: required, must exist in customer_vehicles table
+- `user_id`: required, must exist in users table
+- `outlet_id`: required, must exist in outlets table
+- `service_date`: required, ISO 8601 format
+- `complaint`: required
+- `status`: required, enum values: "Pending", "In Progress", "Completed", "Cancelled"
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Service job created successfully",
+  "data": {
+    "service_job_id": 1,
+    "service_code": "SJ-2024-001",
+    "customer_id": 1,
+    "vehicle_id": 1,
+    "user_id": 1,
+    "outlet_id": 1,
+    "service_date": "2024-01-01T09:00:00Z",
+    "complaint": "Engine making strange noise",
+    "diagnosis": "Need oil change and engine inspection",
+    "estimated_cost": 500000,
+    "actual_cost": 0,
+    "status": "Pending",
+    "notes": "Customer priority service",
+    "customer": {
+      "customer_id": 1,
+      "name": "John Doe",
+      "phone_number": "081234567890"
+    },
+    "vehicle": {
+      "vehicle_id": 1,
+      "plate_number": "B1234XYZ",
+      "brand": "Toyota",
+      "model": "Avanza"
+    },
+    "user": {
+      "user_id": 1,
+      "name": "Mechanic John"
+    },
+    "outlet": {
+      "outlet_id": 1,
+      "outlet_name": "Main Workshop"
+    },
+    "created_at": "2024-01-01T09:00:00Z",
+    "updated_at": "2024-01-01T09:00:00Z"
+  }
+}
+```
+
+#### GET /api/v1/service-jobs
+List all service jobs with pagination.
+
+**Query Parameters:**
+- `page` (optional): Page number (default: 1)
+- `limit` (optional): Items per page (default: 10)
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Service jobs retrieved successfully",
+  "data": [
+    {
+      "service_job_id": 1,
+      "service_code": "SJ-2024-001",
+      "customer_id": 1,
+      "vehicle_id": 1,
+      "user_id": 1,
+      "outlet_id": 1,
+      "service_date": "2024-01-01T09:00:00Z",
+      "complaint": "Engine making strange noise",
+      "diagnosis": "Need oil change and engine inspection",
+      "estimated_cost": 500000,
+      "actual_cost": 450000,
+      "status": "Completed",
+      "customer": {
+        "customer_id": 1,
+        "name": "John Doe",
+        "phone_number": "081234567890"
+      },
+      "vehicle": {
+        "vehicle_id": 1,
+        "plate_number": "B1234XYZ",
+        "brand": "Toyota",
+        "model": "Avanza"
+      },
+      "created_at": "2024-01-01T09:00:00Z",
+      "updated_at": "2024-01-01T15:00:00Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 1,
+    "pages": 1
+  }
+}
+```
+
+#### GET /api/v1/service-jobs/:id
+Get service job by ID.
+
+**Path Parameters:**
+- `id`: Service Job ID
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Service job retrieved successfully",
+  "data": {
+    "service_job_id": 1,
+    "service_code": "SJ-2024-001",
+    "customer_id": 1,
+    "vehicle_id": 1,
+    "user_id": 1,
+    "outlet_id": 1,
+    "service_date": "2024-01-01T09:00:00Z",
+    "complaint": "Engine making strange noise",
+    "diagnosis": "Need oil change and engine inspection",
+    "estimated_cost": 500000,
+    "actual_cost": 450000,
+    "status": "Completed",
+    "notes": "Customer priority service",
+    "customer": {
+      "customer_id": 1,
+      "name": "John Doe",
+      "phone_number": "081234567890",
+      "address": "Jl. Sudirman No. 456"
+    },
+    "vehicle": {
+      "vehicle_id": 1,
+      "plate_number": "B1234XYZ",
+      "brand": "Toyota",
+      "model": "Avanza",
+      "production_year": 2020
+    },
+    "user": {
+      "user_id": 1,
+      "name": "Mechanic John",
+      "email": "mechanic@workshop.com"
+    },
+    "outlet": {
+      "outlet_id": 1,
+      "outlet_name": "Main Workshop",
+      "city": "Jakarta"
+    },
+    "service_details": [
+      {
+        "service_detail_id": 1,
+        "service_id": 1,
+        "quantity": 1,
+        "unit_price": 150000,
+        "subtotal": 150000
+      }
+    ],
+    "created_at": "2024-01-01T09:00:00Z",
+    "updated_at": "2024-01-01T15:00:00Z"
+  }
+}
+```
+
+#### PUT /api/v1/service-jobs/:id
+Update service job information.
+
+**Path Parameters:**
+- `id`: Service Job ID
+
+**Request Body:**
+```json
+{
+  "diagnosis": "Oil change completed, engine inspection clean",
+  "actual_cost": 450000,
+  "notes": "Service completed successfully"
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Service job updated successfully",
+  "data": {
+    "service_job_id": 1,
+    "service_code": "SJ-2024-001",
+    "diagnosis": "Oil change completed, engine inspection clean",
+    "actual_cost": 450000,
+    "notes": "Service completed successfully",
+    "updated_at": "2024-01-01T15:00:00Z"
+  }
+}
+```
+
+#### PUT /api/v1/service-jobs/:id/status
+Update service job status.
+
+**Path Parameters:**
+- `id`: Service Job ID
+
+**Request Body:**
+```json
+{
+  "status": "In Progress",
+  "status_notes": "Started working on the vehicle"
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Service job status updated successfully",
+  "data": {
+    "service_job_id": 1,
+    "status": "In Progress",
+    "updated_at": "2024-01-01T10:00:00Z"
+  }
+}
+```
+
+#### DELETE /api/v1/service-jobs/:id
+Delete service job (soft delete).
+
+**Path Parameters:**
+- `id`: Service Job ID
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Service job deleted successfully"
+}
+```
+
+#### GET /api/v1/service-jobs/service-code
+Get service job by service code.
+
+**Query Parameters:**
+- `service_code`: Service code
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Service job retrieved successfully",
+  "data": {
+    "service_job_id": 1,
+    "service_code": "SJ-2024-001",
+    "customer_id": 1,
+    "vehicle_id": 1,
+    "status": "Completed",
+    "service_date": "2024-01-01T09:00:00Z",
+    "estimated_cost": 500000,
+    "actual_cost": 450000
+  }
+}
+```
+
+#### GET /api/v1/service-jobs/status
+Get service jobs by status.
+
+**Query Parameters:**
+- `status`: Service job status
+- `page` (optional): Page number (default: 1)
+- `limit` (optional): Items per page (default: 10)
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Service jobs retrieved successfully",
+  "data": [
+    {
+      "service_job_id": 1,
+      "service_code": "SJ-2024-001",
+      "status": "Completed",
+      "service_date": "2024-01-01T09:00:00Z",
+      "customer": {
+        "customer_id": 1,
+        "name": "John Doe"
+      },
+      "vehicle": {
+        "vehicle_id": 1,
+        "plate_number": "B1234XYZ"
+      }
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 1,
+    "pages": 1
+  }
+}
+```
+
+#### GET /api/v1/customers/:customer_id/service-jobs
+Get service jobs by customer.
+
+**Path Parameters:**
+- `customer_id`: Customer ID
+
+**Query Parameters:**
+- `page` (optional): Page number (default: 1)
+- `limit` (optional): Items per page (default: 10)
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Customer service jobs retrieved successfully",
+  "data": [
+    {
+      "service_job_id": 1,
+      "service_code": "SJ-2024-001",
+      "service_date": "2024-01-01T09:00:00Z",
+      "status": "Completed",
+      "estimated_cost": 500000,
+      "actual_cost": 450000,
+      "vehicle": {
+        "vehicle_id": 1,
+        "plate_number": "B1234XYZ",
+        "brand": "Toyota",
+        "model": "Avanza"
+      }
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 1,
+    "pages": 1
+  }
+}
+```
+
+### Service Details
+
+Service details represent individual services performed within a service job.
+
+#### POST /api/v1/service-details
+Create a new service detail.
+
+**Request Body:**
+```json
+{
+  "service_job_id": 1,
+  "service_id": 1,
+  "quantity": 1,
+  "unit_price": 150000,
+  "discount": 0,
+  "notes": "Standard oil change service"
+}
+```
+
+**Validation Rules:**
+- `service_job_id`: required, must exist in service_jobs table
+- `service_id`: required, must exist in services table
+- `quantity`: required, must be positive number
+- `unit_price`: required, must be positive number
+- `discount`: optional, must be non-negative number
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Service detail created successfully",
+  "data": {
+    "service_detail_id": 1,
+    "service_job_id": 1,
+    "service_id": 1,
+    "quantity": 1,
+    "unit_price": 150000,
+    "discount": 0,
+    "subtotal": 150000,
+    "notes": "Standard oil change service",
+    "service": {
+      "service_id": 1,
+      "service_code": "ENG001",
+      "name": "Engine Oil Change",
+      "fee": 150000
+    },
+    "created_at": "2024-01-01T09:30:00Z",
+    "updated_at": "2024-01-01T09:30:00Z"
+  }
+}
+```
+
+#### PUT /api/v1/service-details/:id
+Update service detail.
+
+**Path Parameters:**
+- `id`: Service Detail ID
+
+**Request Body:**
+```json
+{
+  "quantity": 1,
+  "unit_price": 180000,
+  "discount": 10000,
+  "notes": "Premium oil change service"
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Service detail updated successfully",
+  "data": {
+    "service_detail_id": 1,
+    "service_job_id": 1,
+    "service_id": 1,
+    "quantity": 1,
+    "unit_price": 180000,
+    "discount": 10000,
+    "subtotal": 170000,
+    "notes": "Premium oil change service",
+    "updated_at": "2024-01-01T10:00:00Z"
+  }
+}
+```
+
+#### DELETE /api/v1/service-details/:id
+Delete service detail.
+
+**Path Parameters:**
+- `id`: Service Detail ID
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Service detail deleted successfully"
+}
+```
+
+#### GET /api/v1/service-jobs/:service_job_id/details
+Get all service details for a service job.
+
+**Path Parameters:**
+- `service_job_id`: Service Job ID
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Service job details retrieved successfully",
+  "data": [
+    {
+      "service_detail_id": 1,
+      "service_job_id": 1,
+      "service_id": 1,
+      "quantity": 1,
+      "unit_price": 150000,
+      "discount": 0,
+      "subtotal": 150000,
+      "notes": "Standard oil change service",
+      "service": {
+        "service_id": 1,
+        "service_code": "ENG001",
+        "name": "Engine Oil Change",
+        "fee": 150000,
+        "service_category": {
+          "service_category_id": 1,
+          "name": "Engine Services"
+        }
+      },
+      "created_at": "2024-01-01T09:30:00Z",
+      "updated_at": "2024-01-01T09:30:00Z"
+    }
+  ]
+}
+```
+
+### Service Job History
+
+Service job history tracks status changes and important events throughout the service job lifecycle.
+
+#### GET /api/v1/service-jobs/:service_job_id/histories
+Get service job history.
+
+**Path Parameters:**
+- `service_job_id`: Service Job ID
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Service job histories retrieved successfully",
+  "data": [
+    {
+      "service_job_history_id": 1,
+      "service_job_id": 1,
+      "user_id": 1,
+      "status_from": "Pending",
+      "status_to": "In Progress",
+      "notes": "Started working on the vehicle",
+      "changed_at": "2024-01-01T10:00:00Z",
+      "user": {
+        "user_id": 1,
+        "name": "Mechanic John"
+      }
+    },
+    {
+      "service_job_history_id": 2,
+      "service_job_id": 1,
+      "user_id": 1,
+      "status_from": "In Progress",
+      "status_to": "Completed",
+      "notes": "Service completed successfully",
+      "changed_at": "2024-01-01T15:00:00Z",
+      "user": {
+        "user_id": 1,
+        "name": "Mechanic John"
+      }
+    }
+  ]
 }
 ```
 
@@ -1643,6 +2688,20 @@ Update payment method.
     "status": "Aktif",
     "updated_at": "2024-01-01T11:00:00Z"
   }
+}
+```
+
+#### DELETE /api/v1/payment-methods/:id
+Delete payment method (soft delete).
+
+**Path Parameters:**
+- `id`: Payment Method ID
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Payment method deleted successfully"
 }
 ```
 
@@ -1816,6 +2875,20 @@ Update transaction.
 }
 ```
 
+#### DELETE /api/v1/transactions/:id
+Delete transaction (soft delete).
+
+**Path Parameters:**
+- `id`: Transaction ID
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Transaction deleted successfully"
+}
+```
+
 #### GET /api/v1/transactions/invoice
 Get transaction by invoice number.
 
@@ -1859,6 +2932,49 @@ Get transactions by status.
       "transaction_date": "2024-01-01T10:00:00Z"
     }
   ]
+}
+```
+
+#### GET /api/v1/transactions/date-range
+Get transactions by date range.
+
+**Query Parameters:**
+- `start_date`: Start date (ISO 8601 format)
+- `end_date`: End date (ISO 8601 format)
+- `page` (optional): Page number (default: 1)
+- `limit` (optional): Items per page (default: 10)
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Transactions retrieved successfully",
+  "data": [
+    {
+      "transaction_id": 1,
+      "invoice_number": "INV-2024-001",
+      "transaction_date": "2024-01-01T10:00:00Z",
+      "user_id": 1,
+      "customer_id": 1,
+      "outlet_id": 1,
+      "transaction_type": "Sale",
+      "status": "sukses",
+      "user": {
+        "user_id": 1,
+        "name": "John Doe"
+      },
+      "customer": {
+        "customer_id": 1,
+        "name": "Jane Smith"
+      }
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 1,
+    "pages": 1
+  }
 }
 ```
 
@@ -2060,6 +3176,20 @@ Update cash flow.
     "description": "Updated sale transaction payment",
     "updated_at": "2024-01-01T11:00:00Z"
   }
+}
+```
+
+#### DELETE /api/v1/cash-flows/:id
+Delete cash flow (soft delete).
+
+**Path Parameters:**
+- `id`: Cash Flow ID
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Cash flow deleted successfully"
 }
 ```
 

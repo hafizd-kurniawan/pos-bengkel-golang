@@ -18,6 +18,13 @@ type UsecaseManager struct {
 	Customer        interfaces.CustomerUsecase
 	CustomerVehicle interfaces.CustomerVehicleUsecase
 
+	// Master Data & Inventory
+	Product             interfaces.ProductUsecase
+	ProductSerialNumber interfaces.ProductSerialNumberUsecase
+	Category            interfaces.CategoryUsecase
+	Supplier            interfaces.SupplierUsecase
+	UnitType            interfaces.UnitTypeUsecase
+
 	// Add other usecases as they are implemented
 }
 
@@ -33,6 +40,13 @@ func NewUsecaseManager(repo *repository.RepositoryManager) *UsecaseManager {
 		// Customer & Vehicle
 		Customer:        implementations.NewCustomerUsecase(repo),
 		CustomerVehicle: implementations.NewCustomerVehicleUsecase(repo),
+
+		// Master Data & Inventory
+		Product:             implementations.NewProductUsecase(repo),
+		ProductSerialNumber: implementations.NewProductSerialNumberUsecase(repo),
+		Category:            implementations.NewCategoryUsecase(repo),
+		Supplier:            implementations.NewSupplierUsecase(repo),
+		UnitType:            implementations.NewUnitTypeUsecase(repo),
 
 		// Add other usecases as they are implemented
 	}

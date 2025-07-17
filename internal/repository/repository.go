@@ -67,6 +67,13 @@ func NewRepositoryManager(db *gorm.DB) *RepositoryManager {
 		Customer:        implementations.NewCustomerRepository(db),
 		CustomerVehicle: implementations.NewCustomerVehicleRepository(db),
 
+		// Master Data & Inventory
+		Product:             implementations.NewProductRepository(db),
+		ProductSerialNumber: implementations.NewProductSerialNumberRepository(db),
+		Category:            implementations.NewCategoryRepository(db),
+		Supplier:            implementations.NewSupplierRepository(db),
+		UnitType:            implementations.NewUnitTypeRepository(db),
+
 		// Add other repositories as they are implemented
 	}
 }

@@ -50,8 +50,8 @@ func NewUsecaseManager(repo *repository.RepositoryManager) *UsecaseManager {
 		// Foundation & Security
 		User:   implementations.NewUserUsecase(repo),
 		Outlet: implementations.NewOutletUsecase(repo),
-		// Role:       implementations.NewRoleUsecase(repo),
-		// Permission: implementations.NewPermissionUsecase(repo),
+		Role:       implementations.NewRoleUsecase(repo),
+		Permission: implementations.NewPermissionUsecase(repo),
 
 		// Customer & Vehicle
 		Customer:        implementations.NewCustomerUsecase(repo),

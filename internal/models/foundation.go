@@ -28,7 +28,7 @@ type Outlet struct {
 	OutletName   string         `gorm:"size:255;not null" json:"outlet_name"`
 	BranchType   string         `gorm:"size:50;not null" json:"branch_type"`
 	City         string         `gorm:"size:100;not null" json:"city"`
-	Address      string         `gorm:"type:text" json:"address"`
+	Address      *string        `gorm:"type:text" json:"address"`
 	PhoneNumber  *string        `gorm:"size:20" json:"phone_number"`
 	Status       StatusUmum     `gorm:"not null;default:'Aktif'" json:"status"`
 	CreatedAt    time.Time      `json:"created_at"`

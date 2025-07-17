@@ -74,6 +74,13 @@ func NewRepositoryManager(db *gorm.DB) *RepositoryManager {
 		Supplier:            implementations.NewSupplierRepository(db),
 		UnitType:            implementations.NewUnitTypeRepository(db),
 
+		// Services
+		Service:           implementations.NewServiceRepository(db),
+		ServiceCategory:   implementations.NewServiceCategoryRepository(db),
+		ServiceJob:        implementations.NewServiceJobRepository(db),
+		ServiceDetail:     implementations.NewServiceDetailRepository(db),
+		ServiceJobHistory: implementations.NewServiceJobHistoryRepository(db),
+
 		// Add other repositories as they are implemented
 	}
 }

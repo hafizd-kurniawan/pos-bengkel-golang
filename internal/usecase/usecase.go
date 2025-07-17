@@ -25,6 +25,13 @@ type UsecaseManager struct {
 	Supplier            interfaces.SupplierUsecase
 	UnitType            interfaces.UnitTypeUsecase
 
+	// Services
+	Service           interfaces.ServiceUsecase
+	ServiceCategory   interfaces.ServiceCategoryUsecase
+	ServiceJob        interfaces.ServiceJobUsecase
+	ServiceDetail     interfaces.ServiceDetailUsecase
+	ServiceJobHistory interfaces.ServiceJobHistoryUsecase
+
 	// Add other usecases as they are implemented
 }
 
@@ -47,6 +54,13 @@ func NewUsecaseManager(repo *repository.RepositoryManager) *UsecaseManager {
 		Category:            implementations.NewCategoryUsecase(repo),
 		Supplier:            implementations.NewSupplierUsecase(repo),
 		UnitType:            implementations.NewUnitTypeUsecase(repo),
+
+		// Services
+		Service:           implementations.NewServiceUsecase(repo),
+		ServiceCategory:   implementations.NewServiceCategoryUsecase(repo),
+		ServiceJob:        implementations.NewServiceJobUsecase(repo),
+		ServiceDetail:     implementations.NewServiceDetailUsecase(repo),
+		ServiceJobHistory: implementations.NewServiceJobHistoryUsecase(repo),
 
 		// Add other usecases as they are implemented
 	}

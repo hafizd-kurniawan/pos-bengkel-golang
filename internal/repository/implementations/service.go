@@ -365,6 +365,56 @@ func (r *ServiceJobRepository) GetQueueNumber(ctx context.Context, outletID uint
 	return maxQueue + 1, nil
 }
 
+// ============= Queue Management Methods =============
+
+// GetQueueByOutletID retrieves all service jobs in queue for an outlet
+func (r *ServiceJobRepository) GetQueueByOutletID(ctx context.Context, outletID uint) ([]*models.ServiceJob, error) {
+	var serviceJobs []*models.ServiceJob
+	err := r.db.WithContext(ctx).
+		Preload("Customer").
+		Preload("Vehicle").
+		Preload("Technician").
+		Preload("ReceivedByUser").
+		Preload("Outlet").
+		Preload("Histories").
+		Where("outlet_id = ? AND status IN (?)", outletID, []models.ServiceStatusEnum{
+			models.ServiceStatusAntri,
+			models.ServiceStatusDikerjakan,
+		}).
+		Order("queue_number ASC, created_at ASC").
+		Find(&serviceJobs).Error
+	return serviceJobs, err
+}
+
+// GetTodayQueueByOutletID retrieves today's service jobs in queue for an outlet
+func (r *ServiceJobRepository) GetTodayQueueByOutletID(ctx context.Context, outletID uint) ([]*models.ServiceJob, error) {
+	var serviceJobs []*models.ServiceJob
+	err := r.db.WithContext(ctx).
+		Preload("Customer").
+		Preload("Vehicle").
+		Preload("Technician").
+		Preload("ReceivedByUser").
+		Preload("Outlet").
+		Preload("Histories").
+		Where("outlet_id = ? AND DATE(service_in_date) = CURRENT_DATE AND status IN (?)", 
+			outletID, 
+			[]models.ServiceStatusEnum{
+				models.ServiceStatusAntri,
+				models.ServiceStatusDikerjakan,
+			}).
+		Order("queue_number ASC, created_at ASC").
+		Find(&serviceJobs).Error
+	return serviceJobs, err
+}
+
+// UpdateQueueNumber updates the queue number for a service job
+func (r *ServiceJobRepository) UpdateQueueNumber(ctx context.Context, serviceJobID uint, queueNumber int) error {
+	return r.db.WithContext(ctx).
+		Model(&models.ServiceJob{}).
+		Where("service_job_id = ?", serviceJobID).
+		Update("queue_number", queueNumber).Error
+}
+
 // ServiceDetailRepository implements the service detail repository interface
 type ServiceDetailRepository struct {
 	db *gorm.DB

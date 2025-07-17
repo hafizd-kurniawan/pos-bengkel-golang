@@ -811,3 +811,106 @@ Status:  "success",
 Message: "Service job status updated successfully",
 })
 }
+
+// ============= Queue Management Handlers =============
+
+// GetServiceJobQueue retrieves all service jobs in queue for an outlet
+func (h *ServiceHandler) GetServiceJobQueue(c *fiber.Ctx) error {
+	outletID, err := strconv.ParseUint(c.Params("outlet_id"), 10, 32)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(responses.Response{
+			Status:  "error",
+			Message: "Invalid outlet ID",
+			Error:   err.Error(),
+		})
+	}
+
+	serviceJobs, err := h.usecase.ServiceJob.GetServiceJobQueue(c.Context(), uint(outletID))
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(responses.Response{
+			Status:  "error",
+			Message: "Failed to retrieve service job queue",
+			Error:   err.Error(),
+		})
+	}
+
+	var serviceJobResponses []interface{}
+	for _, serviceJob := range serviceJobs {
+		serviceJobResponses = append(serviceJobResponses, responses.ToServiceJobResponse(serviceJob))
+	}
+
+	return c.Status(fiber.StatusOK).JSON(responses.Response{
+		Status:  "success",
+		Message: "Service job queue retrieved successfully",
+		Data:    serviceJobResponses,
+	})
+}
+
+// GetTodayServiceJobQueue retrieves today's service jobs in queue for an outlet
+func (h *ServiceHandler) GetTodayServiceJobQueue(c *fiber.Ctx) error {
+	outletID, err := strconv.ParseUint(c.Params("outlet_id"), 10, 32)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(responses.Response{
+			Status:  "error",
+			Message: "Invalid outlet ID",
+			Error:   err.Error(),
+		})
+	}
+
+	serviceJobs, err := h.usecase.ServiceJob.GetTodayServiceJobQueue(c.Context(), uint(outletID))
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(responses.Response{
+			Status:  "error",
+			Message: "Failed to retrieve today's service job queue",
+			Error:   err.Error(),
+		})
+	}
+
+	var serviceJobResponses []interface{}
+	for _, serviceJob := range serviceJobs {
+		serviceJobResponses = append(serviceJobResponses, responses.ToServiceJobResponse(serviceJob))
+	}
+
+	return c.Status(fiber.StatusOK).JSON(responses.Response{
+		Status:  "success",
+		Message: "Today's service job queue retrieved successfully",
+		Data:    serviceJobResponses,
+	})
+}
+
+// ReorderServiceJobQueue reorders service jobs in the queue
+func (h *ServiceHandler) ReorderServiceJobQueue(c *fiber.Ctx) error {
+	outletID, err := strconv.ParseUint(c.Params("outlet_id"), 10, 32)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(responses.Response{
+			Status:  "error",
+			Message: "Invalid outlet ID",
+			Error:   err.Error(),
+		})
+	}
+
+	var req struct {
+		ServiceJobIDs []uint `json:"service_job_ids" validate:"required"`
+	}
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(responses.Response{
+			Status:  "error",
+			Message: "Invalid request body",
+			Error:   err.Error(),
+		})
+	}
+
+	err = h.usecase.ServiceJob.ReorderServiceJobQueue(c.Context(), uint(outletID), req.ServiceJobIDs)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(responses.Response{
+			Status:  "error",
+			Message: "Failed to reorder service job queue",
+			Error:   err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(responses.Response{
+		Status:  "success",
+		Message: "Service job queue reordered successfully",
+	})
+}

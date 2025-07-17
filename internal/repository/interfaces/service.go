@@ -44,6 +44,11 @@ type ServiceJobRepository interface {
 	GetByStatus(ctx context.Context, status models.ServiceStatusEnum) ([]*models.ServiceJob, error)
 	UpdateStatus(ctx context.Context, id uint, status models.ServiceStatusEnum) error
 	GetQueueNumber(ctx context.Context, outletID uint) (int, error)
+	
+	// Queue management methods
+	GetQueueByOutletID(ctx context.Context, outletID uint) ([]*models.ServiceJob, error)
+	GetTodayQueueByOutletID(ctx context.Context, outletID uint) ([]*models.ServiceJob, error)
+	UpdateQueueNumber(ctx context.Context, serviceJobID uint, queueNumber int) error
 }
 
 // ServiceDetailRepository interface for service detail operations

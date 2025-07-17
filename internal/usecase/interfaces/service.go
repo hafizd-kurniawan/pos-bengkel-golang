@@ -139,7 +139,13 @@ type ServiceJobUsecase interface {
 	GetServiceJobsByOutlet(ctx context.Context, outletID uint) ([]*models.ServiceJob, error)
 	GetServiceJobsByStatus(ctx context.Context, status models.ServiceStatusEnum) ([]*models.ServiceJob, error)
 	UpdateServiceJobStatus(ctx context.Context, id uint, status models.ServiceStatusEnum, userID uint, notes *string) error
+	UpdateServiceJobStatusWithTechnician(ctx context.Context, id uint, status models.ServiceStatusEnum, userID uint, technicianID *uint, notes *string) error
 	CalculateServiceJobTotals(ctx context.Context, serviceJobID uint) error
+	
+	// Queue management methods
+	GetServiceJobQueue(ctx context.Context, outletID uint) ([]*models.ServiceJob, error)
+	GetTodayServiceJobQueue(ctx context.Context, outletID uint) ([]*models.ServiceJob, error)
+	ReorderServiceJobQueue(ctx context.Context, outletID uint, serviceJobIDs []uint) error
 }
 
 type ServiceDetailUsecase interface {

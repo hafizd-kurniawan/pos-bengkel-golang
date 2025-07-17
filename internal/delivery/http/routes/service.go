@@ -68,4 +68,11 @@ func SetupServiceRoutes(app *fiber.App, usecase *usecase.UsecaseManager) {
 	
 	// Service job specific histories
 	serviceJobs.Get("/:service_job_id/histories", serviceHandler.GetServiceJobHistoriesByServiceJob)
+
+	// ============= Queue Management Routes =============
+	
+	// Queue management endpoints
+	api.Get("/queue/:outlet_id", serviceHandler.GetServiceJobQueue)
+	api.Get("/queue/:outlet_id/today", serviceHandler.GetTodayServiceJobQueue)
+	api.Put("/queue/:outlet_id/reorder", serviceHandler.ReorderServiceJobQueue)
 }

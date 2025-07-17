@@ -669,6 +669,143 @@ func (u *ServiceJobUsecase) GetServiceJobsByStatus(ctx context.Context, status m
 // UpdateServiceJobStatus updates service job status and creates history
 func (u *ServiceJobUsecase) UpdateServiceJobStatus(ctx context.Context, id uint, status models.ServiceStatusEnum, userID uint, notes *string) error {
 	// Validate service job exists
+	serviceJob, err := u.repo.ServiceJob.GetByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errors.New("service job not found")
+		}
+		return err
+	}
+
+	// Validate user exists
+	_, err = u.repo.User.GetByID(ctx, userID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errors.New("user not found")
+		}
+		return err
+	}
+
+	// Handle status transition logic
+	switch status {
+	case models.ServiceStatusDikerjakan:
+		// When starting work, validate technician is assigned
+		if serviceJob.TechnicianID == nil {
+			return errors.New("technician must be assigned before starting work")
+		}
+	case models.ServiceStatusSelesai:
+		// When completing, ensure all details are calculated
+		if err := u.CalculateServiceJobTotals(ctx, id); err != nil {
+			fmt.Printf("Warning: Failed to calculate totals: %v\n", err)
+		}
+	case models.ServiceStatusDiambil:
+		// When picked up, ensure all payments are settled
+		// This is where you could add payment validation logic
+		// Update picked up date
+		now := time.Now()
+		updateReq := interfaces.UpdateServiceJobRequest{
+			PickedUpDate: &now,
+		}
+		if _, err := u.UpdateServiceJob(ctx, id, updateReq); err != nil {
+			fmt.Printf("Warning: Failed to update picked up date: %v\n", err)
+		}
+	}
+
+	// Update status
+	if err := u.repo.ServiceJob.UpdateStatus(ctx, id, status); err != nil {
+		return err
+	}
+
+	// Create history entry
+	historyNotes := notes
+	if historyNotes == nil {
+		statusNote := fmt.Sprintf("Status changed to %s", string(status))
+		historyNotes = &statusNote
+	}
+	
+	historyReq := interfaces.CreateServiceJobHistoryRequest{
+		ServiceJobID: id,
+		UserID:       userID,
+		Notes:        historyNotes,
+	}
+	_, err = u.createServiceJobHistory(ctx, historyReq)
+	if err != nil {
+		// Don't fail the entire operation for history creation failure
+		fmt.Printf("Failed to create service job history: %v\n", err)
+	}
+
+	return nil
+}
+
+// ============= Queue Management Methods =============
+
+// GetServiceJobQueue retrieves all service jobs in queue for an outlet
+func (u *ServiceJobUsecase) GetServiceJobQueue(ctx context.Context, outletID uint) ([]*models.ServiceJob, error) {
+	// Validate outlet exists
+	_, err := u.repo.Outlet.GetByID(ctx, outletID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("outlet not found")
+		}
+		return nil, err
+	}
+
+	// Get all service jobs in queue order (Antri and Dikerjakan status)
+	return u.repo.ServiceJob.GetQueueByOutletID(ctx, outletID)
+}
+
+// GetTodayServiceJobQueue retrieves today's service jobs in queue for an outlet
+func (u *ServiceJobUsecase) GetTodayServiceJobQueue(ctx context.Context, outletID uint) ([]*models.ServiceJob, error) {
+	// Validate outlet exists
+	_, err := u.repo.Outlet.GetByID(ctx, outletID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("outlet not found")
+		}
+		return nil, err
+	}
+
+	// Get today's service jobs in queue order
+	return u.repo.ServiceJob.GetTodayQueueByOutletID(ctx, outletID)
+}
+
+// ReorderServiceJobQueue reorders service jobs in the queue
+func (u *ServiceJobUsecase) ReorderServiceJobQueue(ctx context.Context, outletID uint, serviceJobIDs []uint) error {
+	// Validate outlet exists
+	_, err := u.repo.Outlet.GetByID(ctx, outletID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errors.New("outlet not found")
+		}
+		return err
+	}
+
+	// Validate all service jobs exist and belong to the outlet
+	for i, serviceJobID := range serviceJobIDs {
+		serviceJob, err := u.repo.ServiceJob.GetByID(ctx, serviceJobID)
+		if err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return fmt.Errorf("service job with ID %d not found", serviceJobID)
+			}
+			return err
+		}
+		
+		if serviceJob.OutletID != outletID {
+			return fmt.Errorf("service job with ID %d does not belong to outlet %d", serviceJobID, outletID)
+		}
+
+		// Update queue number (1-based)
+		if err := u.repo.ServiceJob.UpdateQueueNumber(ctx, serviceJobID, i+1); err != nil {
+			return fmt.Errorf("failed to update queue number for service job %d: %v", serviceJobID, err)
+		}
+	}
+
+	return nil
+}
+
+// UpdateServiceJobStatusWithTechnician updates service job status and assigns technician
+func (u *ServiceJobUsecase) UpdateServiceJobStatusWithTechnician(ctx context.Context, id uint, status models.ServiceStatusEnum, userID uint, technicianID *uint, notes *string) error {
+	// Validate service job exists
 	_, err := u.repo.ServiceJob.GetByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -686,24 +823,29 @@ func (u *ServiceJobUsecase) UpdateServiceJobStatus(ctx context.Context, id uint,
 		return err
 	}
 
-	// Update status
-	if err := u.repo.ServiceJob.UpdateStatus(ctx, id, status); err != nil {
-		return err
+	// Validate technician exists if provided
+	if technicianID != nil {
+		_, err := u.repo.User.GetByID(ctx, *technicianID)
+		if err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return errors.New("technician not found")
+			}
+			return err
+		}
 	}
 
-	// Create history entry
-	historyReq := interfaces.CreateServiceJobHistoryRequest{
-		ServiceJobID: id,
-		UserID:       userID,
-		Notes:        notes,
-	}
-	_, err = u.createServiceJobHistory(ctx, historyReq)
-	if err != nil {
-		// Don't fail the entire operation for history creation failure
-		fmt.Printf("Failed to create service job history: %v\n", err)
+	// Update technician assignment if provided
+	if technicianID != nil {
+		updateReq := interfaces.UpdateServiceJobRequest{
+			TechnicianID: technicianID,
+		}
+		if _, err := u.UpdateServiceJob(ctx, id, updateReq); err != nil {
+			return err
+		}
 	}
 
-	return nil
+	// Update status using existing method
+	return u.UpdateServiceJobStatus(ctx, id, status, userID, notes)
 }
 
 // CalculateServiceJobTotals calculates and updates service job totals

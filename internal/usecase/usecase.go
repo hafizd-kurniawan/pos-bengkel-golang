@@ -14,6 +14,24 @@ type UsecaseManager struct {
 	Role       interfaces.RoleUsecase
 	Permission interfaces.PermissionUsecase
 
+	// Customer & Vehicle
+	Customer        interfaces.CustomerUsecase
+	CustomerVehicle interfaces.CustomerVehicleUsecase
+
+	// Master Data & Inventory
+	Product             interfaces.ProductUsecase
+	ProductSerialNumber interfaces.ProductSerialNumberUsecase
+	Category            interfaces.CategoryUsecase
+	Supplier            interfaces.SupplierUsecase
+	UnitType            interfaces.UnitTypeUsecase
+
+	// Services
+	Service           interfaces.ServiceUsecase
+	ServiceCategory   interfaces.ServiceCategoryUsecase
+	ServiceJob        interfaces.ServiceJobUsecase
+	ServiceDetail     interfaces.ServiceDetailUsecase
+	ServiceJobHistory interfaces.ServiceJobHistoryUsecase
+
 	// Add other usecases as they are implemented
 }
 
@@ -25,6 +43,24 @@ func NewUsecaseManager(repo *repository.RepositoryManager) *UsecaseManager {
 		Outlet: implementations.NewOutletUsecase(repo),
 		// Role:       implementations.NewRoleUsecase(repo),
 		// Permission: implementations.NewPermissionUsecase(repo),
+
+		// Customer & Vehicle
+		Customer:        implementations.NewCustomerUsecase(repo),
+		CustomerVehicle: implementations.NewCustomerVehicleUsecase(repo),
+
+		// Master Data & Inventory
+		Product:             implementations.NewProductUsecase(repo),
+		ProductSerialNumber: implementations.NewProductSerialNumberUsecase(repo),
+		Category:            implementations.NewCategoryUsecase(repo),
+		Supplier:            implementations.NewSupplierUsecase(repo),
+		UnitType:            implementations.NewUnitTypeUsecase(repo),
+
+		// Services
+		Service:           implementations.NewServiceUsecase(repo),
+		ServiceCategory:   implementations.NewServiceCategoryUsecase(repo),
+		ServiceJob:        implementations.NewServiceJobUsecase(repo),
+		ServiceDetail:     implementations.NewServiceDetailUsecase(repo),
+		ServiceJobHistory: implementations.NewServiceJobHistoryUsecase(repo),
 
 		// Add other usecases as they are implemented
 	}

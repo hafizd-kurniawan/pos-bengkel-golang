@@ -2,13 +2,17 @@ package server
 
 import (
 	"boilerplate/config"
+	"boilerplate/internal/delivery/http/routes"
 	"boilerplate/internal/middleware"
+	"boilerplate/internal/repository"
+	"boilerplate/internal/usecase"
 	"boilerplate/internal/wrapper/handler"
-	"boilerplate/internal/wrapper/repository"
-	"boilerplate/internal/wrapper/usecase"
+	repo_wrapper "boilerplate/internal/wrapper/repository"
+	usecase_wrapper "boilerplate/internal/wrapper/usecase"
 	"boilerplate/pkg/infra/db"
 	"fmt"
 	"log"
+	"time"
 	
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html"
@@ -36,14 +40,34 @@ func Run(conf *config.Config, dbList *db.DatabaseList, appLoger *logrus.Logger) 
 	middleware.DefaultLimitterMiddleware()
 	//middleware.RecoverMiddleware()
 
-	//* Initial Wrapper
+	//* Initial New Architecture (Repository -> Usecase -> Handler)
+	
+	// Initialize new repository manager
+	repoManager := repository.NewRepositoryManager(dbList.DatabaseApp)
+	
+	// Initialize new usecase manager
+	usecaseManager := usecase.NewUsecaseManager(repoManager)
+	
+	// Setup new routes
+	routes.SetupFoundationRoutes(app, usecaseManager)
+	
+	// Health check endpoint
+	app.Get("/health", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{
+			"status": "ok",
+			"message": "POS Bengkel API is running",
+			"timestamp": time.Now(),
+		})
+	})
+
+	//* Initial Old Wrapper (for compatibility)
 
 	if dbList.DatabaseApp == nil {
 		log.Println("is nil")
 	}
 
-	repo := repository.NewRepository(conf, dbList, appLoger)
-	usecase := usecase.NewUsecase(repo, conf, dbList, appLoger)
+	repo := repo_wrapper.NewRepository(conf, dbList, appLoger)
+	usecase := usecase_wrapper.NewUsecase(repo, conf, dbList, appLoger)
 	handler := handler.NewHandler(usecase, conf, appLoger)
 
 	//* Root Endpoint

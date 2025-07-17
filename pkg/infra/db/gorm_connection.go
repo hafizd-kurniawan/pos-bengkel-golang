@@ -6,6 +6,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	gormlog "gorm.io/gorm/logger"
 )
@@ -39,6 +40,10 @@ func NewGORMConnection(conf *config.DatabaseAccount, log *logrus.Logger) *gorm.D
 	//* Open Connection depend on driver
 	if conf.DriverName == "postgres" || conf.DriverName == "pgx" {
 		db, err = gorm.Open(postgres.Open(conf.DriverSource), &gorm.Config{
+			Logger: gormlog.Default.LogMode(gormlog.LogLevel(gormlog.Error)),
+		})
+	} else if conf.DriverName == "sqlite" {
+		db, err = gorm.Open(sqlite.Open(conf.DriverSource), &gorm.Config{
 			Logger: gormlog.Default.LogMode(gormlog.LogLevel(gormlog.Error)),
 		})
 	}

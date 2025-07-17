@@ -86,3 +86,10 @@ const (
 	ReportStatusSelesai ReportStatus = "Selesai"
 	ReportStatusGagal   ReportStatus = "Gagal"
 )
+
+type PromotionType string
+
+const (
+	PromotionTypePercentage PromotionType = "percentage"
+	PromotionTypeFixed      PromotionType = "fixed"
+)

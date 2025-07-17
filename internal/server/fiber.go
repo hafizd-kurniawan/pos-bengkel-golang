@@ -52,6 +52,7 @@ func Run(conf *config.Config, dbList *db.DatabaseList, appLoger *logrus.Logger) 
 	routes.SetupFoundationRoutes(app, usecaseManager)
 	routes.SetupCustomerRoutes(app, usecaseManager)
 	routes.SetupInventoryRoutes(app, usecaseManager)
+	routes.SetupServiceRoutes(app, usecaseManager)
 	
 	// Health check endpoint
 	app.Get("/health", func(c *fiber.Ctx) error {

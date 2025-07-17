@@ -420,3 +420,372 @@ UpdatedAt:  unitType.UpdatedAt,
 // Don't populate products to avoid circular references in API responses
 return response
 }
+
+// ServiceResponse represents service data in API response
+type ServiceResponse struct {
+ServiceID         uint                      `json:"service_id"`
+ServiceCode       string                    `json:"service_code"`
+Name              string                    `json:"name"`
+ServiceCategoryID uint                      `json:"service_category_id"`
+Fee               float64                   `json:"fee"`
+Status            models.StatusUmum         `json:"status"`
+ServiceCategory   *ServiceCategoryResponse  `json:"service_category,omitempty"`
+CreatedAt         time.Time                 `json:"created_at"`
+UpdatedAt         time.Time                 `json:"updated_at"`
+}
+
+// ServiceCategoryResponse represents service category data in API response
+type ServiceCategoryResponse struct {
+ServiceCategoryID uint              `json:"service_category_id"`
+Name              string            `json:"name"`
+Status            models.StatusUmum `json:"status"`
+Services          []ServiceResponse `json:"services,omitempty"`
+CreatedAt         time.Time         `json:"created_at"`
+UpdatedAt         time.Time         `json:"updated_at"`
+}
+
+// ServiceJobResponse represents service job data in API response
+type ServiceJobResponse struct {
+ServiceJobID               uint                      `json:"service_job_id"`
+ServiceCode                string                    `json:"service_code"`
+QueueNumber                int                       `json:"queue_number"`
+CustomerID                 uint                      `json:"customer_id"`
+VehicleID                  uint                      `json:"vehicle_id"`
+TechnicianID               *uint                     `json:"technician_id"`
+ReceivedByUserID           uint                      `json:"received_by_user_id"`
+OutletID                   uint                      `json:"outlet_id"`
+ProblemDescription         string                    `json:"problem_description"`
+TechnicianNotes            *string                   `json:"technician_notes"`
+Status                     models.ServiceStatusEnum  `json:"status"`
+ServiceInDate              time.Time                 `json:"service_in_date"`
+PickedUpDate               *time.Time                `json:"picked_up_date"`
+ComplainDate               *time.Time                `json:"complain_date"`
+WarrantyExpiresAt          *time.Time                `json:"warranty_expires_at"`
+NextServiceReminderDate    *time.Time                `json:"next_service_reminder_date"`
+DownPayment                float64                   `json:"down_payment"`
+GrandTotal                 float64                   `json:"grand_total"`
+TechnicianCommission       float64                   `json:"technician_commission"`
+ShopProfit                 float64                   `json:"shop_profit"`
+Customer                   *CustomerResponse         `json:"customer,omitempty"`
+Vehicle                    *CustomerVehicleResponse  `json:"vehicle,omitempty"`
+Technician                 *UserResponse             `json:"technician,omitempty"`
+ReceivedByUser             *UserResponse             `json:"received_by_user,omitempty"`
+Outlet                     *OutletResponse           `json:"outlet,omitempty"`
+ServiceDetails             []ServiceDetailResponse   `json:"service_details,omitempty"`
+Histories                  []ServiceJobHistoryResponse `json:"histories,omitempty"`
+CreatedAt                  time.Time                 `json:"created_at"`
+UpdatedAt                  time.Time                 `json:"updated_at"`
+}
+
+// ServiceDetailResponse represents service detail data in API response
+type ServiceDetailResponse struct {
+DetailID         uint               `json:"detail_id"`
+ServiceJobID     uint               `json:"service_job_id"`
+ItemID           uint               `json:"item_id"`
+ItemType         string             `json:"item_type"`
+Description      string             `json:"description"`
+SerialNumberUsed *string            `json:"serial_number_used"`
+Quantity         int                `json:"quantity"`
+PricePerItem     float64            `json:"price_per_item"`
+CostPerItem      float64            `json:"cost_per_item"`
+ServiceJob       *ServiceJobResponse `json:"service_job,omitempty"`
+}
+
+// ServiceJobHistoryResponse represents service job history data in API response
+type ServiceJobHistoryResponse struct {
+HistoryID    uint               `json:"history_id"`
+ServiceJobID uint               `json:"service_job_id"`
+UserID       uint               `json:"user_id"`
+Notes        *string            `json:"notes"`
+ChangedAt    time.Time          `json:"changed_at"`
+ServiceJob   *ServiceJobResponse `json:"service_job,omitempty"`
+User         *UserResponse      `json:"user,omitempty"`
+}
+
+// TransactionResponse represents transaction data in API response
+type TransactionResponse struct {
+TransactionID      uint                      `json:"transaction_id"`
+InvoiceNumber      string                    `json:"invoice_number"`
+TransactionDate    time.Time                 `json:"transaction_date"`
+UserID             uint                      `json:"user_id"`
+CustomerID         *uint                     `json:"customer_id"`
+OutletID           uint                      `json:"outlet_id"`
+TransactionType    string                    `json:"transaction_type"`
+Status             models.TransactionStatus  `json:"status"`
+User               *UserResponse             `json:"user,omitempty"`
+Customer           *CustomerResponse         `json:"customer,omitempty"`
+Outlet             *OutletResponse           `json:"outlet,omitempty"`
+TransactionDetails []TransactionDetailResponse `json:"transaction_details,omitempty"`
+CreatedAt          time.Time                 `json:"created_at"`
+UpdatedAt          time.Time                 `json:"updated_at"`
+}
+
+// TransactionDetailResponse represents transaction detail data in API response
+type TransactionDetailResponse struct {
+DetailID        uint                        `json:"detail_id"`
+TransactionType string                      `json:"transaction_type"`
+TransactionID   uint                        `json:"transaction_id"`
+ProductID       *uint                       `json:"product_id"`
+SerialNumberID  *uint                       `json:"serial_number_id"`
+Quantity        int                         `json:"quantity"`
+UnitPrice       float64                     `json:"unit_price"`
+TotalPrice      float64                     `json:"total_price"`
+Transaction     *TransactionResponse        `json:"transaction,omitempty"`
+Product         *ProductResponse            `json:"product,omitempty"`
+SerialNumber    *ProductSerialNumberResponse `json:"serial_number,omitempty"`
+CreatedAt       time.Time                   `json:"created_at"`
+UpdatedAt       time.Time                   `json:"updated_at"`
+}
+
+// PaymentMethodResponse represents payment method data in API response
+type PaymentMethodResponse struct {
+MethodID  uint              `json:"method_id"`
+Name      string            `json:"name"`
+Status    models.StatusUmum `json:"status"`
+CreatedAt time.Time         `json:"created_at"`
+UpdatedAt time.Time         `json:"updated_at"`
+}
+
+// CashFlowResponse represents cash flow data in API response
+type CashFlowResponse struct {
+CashFlowID uint                   `json:"cash_flow_id"`
+Type       models.CashFlowType    `json:"type"`
+Source     string                 `json:"source"`
+Amount     float64                `json:"amount"`
+Date       time.Time              `json:"date"`
+Notes      *string                `json:"notes"`
+UserID     uint                   `json:"user_id"`
+User       *UserResponse          `json:"user,omitempty"`
+CreatedAt  time.Time              `json:"created_at"`
+UpdatedAt  time.Time              `json:"updated_at"`
+}
+
+// Service response transformers
+func ToServiceResponse(service *models.Service) *ServiceResponse {
+response := &ServiceResponse{
+ServiceID:         service.ServiceID,
+ServiceCode:       service.ServiceCode,
+Name:              service.Name,
+ServiceCategoryID: service.ServiceCategoryID,
+Fee:               service.Fee,
+Status:            service.Status,
+CreatedAt:         service.CreatedAt,
+UpdatedAt:         service.UpdatedAt,
+}
+
+if service.ServiceCategory != nil {
+response.ServiceCategory = &ServiceCategoryResponse{
+ServiceCategoryID: service.ServiceCategory.ServiceCategoryID,
+Name:              service.ServiceCategory.Name,
+Status:            service.ServiceCategory.Status,
+CreatedAt:         service.ServiceCategory.CreatedAt,
+UpdatedAt:         service.ServiceCategory.UpdatedAt,
+}
+}
+
+return response
+}
+
+func ToServiceCategoryResponse(category *models.ServiceCategory) *ServiceCategoryResponse {
+response := &ServiceCategoryResponse{
+ServiceCategoryID: category.ServiceCategoryID,
+Name:              category.Name,
+Status:            category.Status,
+CreatedAt:         category.CreatedAt,
+UpdatedAt:         category.UpdatedAt,
+}
+
+if category.Services != nil {
+for _, service := range category.Services {
+response.Services = append(response.Services, *ToServiceResponse(&service))
+}
+}
+
+return response
+}
+
+func ToServiceJobResponse(serviceJob *models.ServiceJob) *ServiceJobResponse {
+response := &ServiceJobResponse{
+ServiceJobID:               serviceJob.ServiceJobID,
+ServiceCode:                serviceJob.ServiceCode,
+QueueNumber:                serviceJob.QueueNumber,
+CustomerID:                 serviceJob.CustomerID,
+VehicleID:                  serviceJob.VehicleID,
+TechnicianID:               serviceJob.TechnicianID,
+ReceivedByUserID:           serviceJob.ReceivedByUserID,
+OutletID:                   serviceJob.OutletID,
+ProblemDescription:         serviceJob.ProblemDescription,
+TechnicianNotes:            serviceJob.TechnicianNotes,
+Status:                     serviceJob.Status,
+ServiceInDate:              serviceJob.ServiceInDate,
+PickedUpDate:               serviceJob.PickedUpDate,
+ComplainDate:               serviceJob.ComplainDate,
+WarrantyExpiresAt:          serviceJob.WarrantyExpiresAt,
+NextServiceReminderDate:    serviceJob.NextServiceReminderDate,
+DownPayment:                serviceJob.DownPayment,
+GrandTotal:                 serviceJob.GrandTotal,
+TechnicianCommission:       serviceJob.TechnicianCommission,
+ShopProfit:                 serviceJob.ShopProfit,
+CreatedAt:                  serviceJob.CreatedAt,
+UpdatedAt:                  serviceJob.UpdatedAt,
+}
+
+if serviceJob.Customer != nil {
+response.Customer = ToCustomerResponse(serviceJob.Customer)
+}
+
+if serviceJob.Vehicle != nil {
+response.Vehicle = ToCustomerVehicleResponse(serviceJob.Vehicle)
+}
+
+if serviceJob.Technician != nil {
+response.Technician = ToUserResponse(serviceJob.Technician)
+}
+
+if serviceJob.ReceivedByUser != nil {
+response.ReceivedByUser = ToUserResponse(serviceJob.ReceivedByUser)
+}
+
+if serviceJob.Outlet != nil {
+response.Outlet = ToOutletResponse(serviceJob.Outlet)
+}
+
+if serviceJob.ServiceDetails != nil {
+for _, detail := range serviceJob.ServiceDetails {
+response.ServiceDetails = append(response.ServiceDetails, *ToServiceDetailResponse(&detail))
+}
+}
+
+if serviceJob.Histories != nil {
+for _, history := range serviceJob.Histories {
+response.Histories = append(response.Histories, *ToServiceJobHistoryResponse(&history))
+}
+}
+
+return response
+}
+
+func ToServiceDetailResponse(detail *models.ServiceDetail) *ServiceDetailResponse {
+response := &ServiceDetailResponse{
+DetailID:         detail.DetailID,
+ServiceJobID:     detail.ServiceJobID,
+ItemID:           detail.ItemID,
+ItemType:         detail.ItemType,
+Description:      detail.Description,
+SerialNumberUsed: detail.SerialNumberUsed,
+Quantity:         detail.Quantity,
+PricePerItem:     detail.PricePerItem,
+CostPerItem:      detail.CostPerItem,
+}
+
+// Avoid circular reference by not including full ServiceJob
+return response
+}
+
+func ToServiceJobHistoryResponse(history *models.ServiceJobHistory) *ServiceJobHistoryResponse {
+response := &ServiceJobHistoryResponse{
+HistoryID:    history.HistoryID,
+ServiceJobID: history.ServiceJobID,
+UserID:       history.UserID,
+Notes:        history.Notes,
+ChangedAt:    history.ChangedAt,
+}
+
+if history.User != nil {
+response.User = ToUserResponse(history.User)
+}
+
+// Avoid circular reference by not including full ServiceJob
+return response
+}
+
+func ToTransactionResponse(transaction *models.Transaction) *TransactionResponse {
+response := &TransactionResponse{
+TransactionID:   transaction.TransactionID,
+InvoiceNumber:   transaction.InvoiceNumber,
+TransactionDate: transaction.TransactionDate,
+UserID:          transaction.UserID,
+CustomerID:      transaction.CustomerID,
+OutletID:        transaction.OutletID,
+TransactionType: transaction.TransactionType,
+Status:          transaction.Status,
+CreatedAt:       transaction.CreatedAt,
+UpdatedAt:       transaction.UpdatedAt,
+}
+
+if transaction.User != nil {
+response.User = ToUserResponse(transaction.User)
+}
+
+if transaction.Customer != nil {
+response.Customer = ToCustomerResponse(transaction.Customer)
+}
+
+if transaction.Outlet != nil {
+response.Outlet = ToOutletResponse(transaction.Outlet)
+}
+
+if transaction.TransactionDetails != nil {
+for _, detail := range transaction.TransactionDetails {
+response.TransactionDetails = append(response.TransactionDetails, *ToTransactionDetailResponse(&detail))
+}
+}
+
+return response
+}
+
+func ToTransactionDetailResponse(detail *models.TransactionDetail) *TransactionDetailResponse {
+response := &TransactionDetailResponse{
+DetailID:        detail.DetailID,
+TransactionType: detail.TransactionType,
+TransactionID:   detail.TransactionID,
+ProductID:       detail.ProductID,
+SerialNumberID:  detail.SerialNumberID,
+Quantity:        detail.Quantity,
+UnitPrice:       detail.UnitPrice,
+TotalPrice:      detail.TotalPrice,
+CreatedAt:       detail.CreatedAt,
+UpdatedAt:       detail.UpdatedAt,
+}
+
+if detail.Product != nil {
+response.Product = ToProductResponse(detail.Product)
+}
+
+if detail.SerialNumber != nil {
+response.SerialNumber = ToProductSerialNumberResponse(detail.SerialNumber)
+}
+
+// Avoid circular reference by not including full Transaction
+return response
+}
+
+func ToPaymentMethodResponse(paymentMethod *models.PaymentMethod) *PaymentMethodResponse {
+return &PaymentMethodResponse{
+MethodID:  paymentMethod.MethodID,
+Name:      paymentMethod.Name,
+Status:    paymentMethod.Status,
+CreatedAt: paymentMethod.CreatedAt,
+UpdatedAt: paymentMethod.UpdatedAt,
+}
+}
+
+func ToCashFlowResponse(cashFlow *models.CashFlow) *CashFlowResponse {
+response := &CashFlowResponse{
+CashFlowID: cashFlow.CashFlowID,
+Type:       cashFlow.Type,
+Source:     cashFlow.Source,
+Amount:     cashFlow.Amount,
+Date:       cashFlow.Date,
+Notes:      cashFlow.Notes,
+UserID:     cashFlow.UserID,
+CreatedAt:  cashFlow.CreatedAt,
+UpdatedAt:  cashFlow.UpdatedAt,
+}
+
+if cashFlow.User != nil {
+response.User = ToUserResponse(cashFlow.User)
+}
+
+return response
+}

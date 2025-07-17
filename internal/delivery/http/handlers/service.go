@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"boilerplate/internal/delivery/http/responses"
+	"boilerplate/internal/models"
 	"boilerplate/internal/usecase"
 	"boilerplate/internal/usecase/interfaces"
 	"strconv"
@@ -381,4 +382,432 @@ func (h *ServiceHandler) GetServicesByCategory(c *fiber.Ctx) error {
 		Message: "Services retrieved successfully",
 		Data:    services,
 	})
+}
+// ============= Service Job Handlers =============
+
+// CreateServiceJob creates a new service job
+func (h *ServiceHandler) CreateServiceJob(c *fiber.Ctx) error {
+var req interfaces.CreateServiceJobRequest
+if err := c.BodyParser(&req); err != nil {
+return c.Status(fiber.StatusBadRequest).JSON(responses.Response{
+Status:  "error",
+Message: "Invalid request body",
+Error:   err.Error(),
+})
+}
+
+serviceJob, err := h.usecase.ServiceJob.CreateServiceJob(c.Context(), req)
+if err != nil {
+return c.Status(fiber.StatusInternalServerError).JSON(responses.Response{
+Status:  "error",
+Message: "Failed to create service job",
+Error:   err.Error(),
+})
+}
+
+return c.Status(fiber.StatusCreated).JSON(responses.Response{
+Status:  "success",
+Message: "Service job created successfully",
+Data:    responses.ToServiceJobResponse(serviceJob),
+})
+}
+
+// GetServiceJob retrieves a service job by ID
+func (h *ServiceHandler) GetServiceJob(c *fiber.Ctx) error {
+id, err := strconv.ParseUint(c.Params("id"), 10, 32)
+if err != nil {
+return c.Status(fiber.StatusBadRequest).JSON(responses.Response{
+Status:  "error",
+Message: "Invalid service job ID",
+Error:   err.Error(),
+})
+}
+
+serviceJob, err := h.usecase.ServiceJob.GetServiceJob(c.Context(), uint(id))
+if err != nil {
+return c.Status(fiber.StatusNotFound).JSON(responses.Response{
+Status:  "error",
+Message: "Service job not found",
+Error:   err.Error(),
+})
+}
+
+return c.Status(fiber.StatusOK).JSON(responses.Response{
+Status:  "success",
+Message: "Service job retrieved successfully",
+Data:    responses.ToServiceJobResponse(serviceJob),
+})
+}
+
+// ListServiceJobs retrieves service jobs with pagination
+func (h *ServiceHandler) ListServiceJobs(c *fiber.Ctx) error {
+limit, _ := strconv.Atoi(c.Query("limit", "10"))
+offset, _ := strconv.Atoi(c.Query("offset", "0"))
+
+serviceJobs, err := h.usecase.ServiceJob.ListServiceJobs(c.Context(), limit, offset)
+if err != nil {
+return c.Status(fiber.StatusInternalServerError).JSON(responses.Response{
+Status:  "error",
+Message: "Failed to retrieve service jobs",
+Error:   err.Error(),
+})
+}
+
+var serviceJobResponses []interface{}
+for _, serviceJob := range serviceJobs {
+serviceJobResponses = append(serviceJobResponses, responses.ToServiceJobResponse(serviceJob))
+}
+
+return c.Status(fiber.StatusOK).JSON(responses.Response{
+Status:  "success",
+Message: "Service jobs retrieved successfully",
+Data:    serviceJobResponses,
+})
+}
+
+// UpdateServiceJob updates a service job
+func (h *ServiceHandler) UpdateServiceJob(c *fiber.Ctx) error {
+id, err := strconv.ParseUint(c.Params("id"), 10, 32)
+if err != nil {
+return c.Status(fiber.StatusBadRequest).JSON(responses.Response{
+Status:  "error",
+Message: "Invalid service job ID",
+Error:   err.Error(),
+})
+}
+
+var req interfaces.UpdateServiceJobRequest
+if err := c.BodyParser(&req); err != nil {
+return c.Status(fiber.StatusBadRequest).JSON(responses.Response{
+Status:  "error",
+Message: "Invalid request body",
+Error:   err.Error(),
+})
+}
+
+serviceJob, err := h.usecase.ServiceJob.UpdateServiceJob(c.Context(), uint(id), req)
+if err != nil {
+return c.Status(fiber.StatusInternalServerError).JSON(responses.Response{
+Status:  "error",
+Message: "Failed to update service job",
+Error:   err.Error(),
+})
+}
+
+return c.Status(fiber.StatusOK).JSON(responses.Response{
+Status:  "success",
+Message: "Service job updated successfully",
+Data:    responses.ToServiceJobResponse(serviceJob),
+})
+}
+
+// DeleteServiceJob deletes a service job
+func (h *ServiceHandler) DeleteServiceJob(c *fiber.Ctx) error {
+id, err := strconv.ParseUint(c.Params("id"), 10, 32)
+if err != nil {
+return c.Status(fiber.StatusBadRequest).JSON(responses.Response{
+Status:  "error",
+Message: "Invalid service job ID",
+Error:   err.Error(),
+})
+}
+
+err = h.usecase.ServiceJob.DeleteServiceJob(c.Context(), uint(id))
+if err != nil {
+return c.Status(fiber.StatusInternalServerError).JSON(responses.Response{
+Status:  "error",
+Message: "Failed to delete service job",
+Error:   err.Error(),
+})
+}
+
+return c.Status(fiber.StatusOK).JSON(responses.Response{
+Status:  "success",
+Message: "Service job deleted successfully",
+})
+}
+
+// GetServiceJobsByCustomer retrieves service jobs by customer ID
+func (h *ServiceHandler) GetServiceJobsByCustomer(c *fiber.Ctx) error {
+customerID, err := strconv.ParseUint(c.Params("customer_id"), 10, 32)
+if err != nil {
+return c.Status(fiber.StatusBadRequest).JSON(responses.Response{
+Status:  "error",
+Message: "Invalid customer ID",
+Error:   err.Error(),
+})
+}
+
+serviceJobs, err := h.usecase.ServiceJob.GetServiceJobsByCustomer(c.Context(), uint(customerID))
+if err != nil {
+return c.Status(fiber.StatusInternalServerError).JSON(responses.Response{
+Status:  "error",
+Message: "Failed to retrieve service jobs",
+Error:   err.Error(),
+})
+}
+
+var serviceJobResponses []interface{}
+for _, serviceJob := range serviceJobs {
+serviceJobResponses = append(serviceJobResponses, responses.ToServiceJobResponse(serviceJob))
+}
+
+return c.Status(fiber.StatusOK).JSON(responses.Response{
+Status:  "success",
+Message: "Service jobs retrieved successfully",
+Data:    serviceJobResponses,
+})
+}
+
+// GetServiceJobsByStatus retrieves service jobs by status
+func (h *ServiceHandler) GetServiceJobsByStatus(c *fiber.Ctx) error {
+status := c.Query("status")
+if status == "" {
+return c.Status(fiber.StatusBadRequest).JSON(responses.Response{
+Status:  "error",
+Message: "Status is required",
+})
+}
+
+serviceJobs, err := h.usecase.ServiceJob.GetServiceJobsByStatus(c.Context(), models.ServiceStatusEnum(status))
+if err != nil {
+return c.Status(fiber.StatusInternalServerError).JSON(responses.Response{
+Status:  "error",
+Message: "Failed to retrieve service jobs",
+Error:   err.Error(),
+})
+}
+
+var serviceJobResponses []interface{}
+for _, serviceJob := range serviceJobs {
+serviceJobResponses = append(serviceJobResponses, responses.ToServiceJobResponse(serviceJob))
+}
+
+return c.Status(fiber.StatusOK).JSON(responses.Response{
+Status:  "success",
+Message: "Service jobs retrieved successfully",
+Data:    serviceJobResponses,
+})
+}
+
+// ============= Service Detail Handlers =============
+
+// CreateServiceDetail creates a new service detail
+func (h *ServiceHandler) CreateServiceDetail(c *fiber.Ctx) error {
+var req interfaces.CreateServiceDetailRequest
+if err := c.BodyParser(&req); err != nil {
+return c.Status(fiber.StatusBadRequest).JSON(responses.Response{
+Status:  "error",
+Message: "Invalid request body",
+Error:   err.Error(),
+})
+}
+
+serviceDetail, err := h.usecase.ServiceDetail.CreateServiceDetail(c.Context(), req)
+if err != nil {
+return c.Status(fiber.StatusInternalServerError).JSON(responses.Response{
+Status:  "error",
+Message: "Failed to create service detail",
+Error:   err.Error(),
+})
+}
+
+return c.Status(fiber.StatusCreated).JSON(responses.Response{
+Status:  "success",
+Message: "Service detail created successfully",
+Data:    responses.ToServiceDetailResponse(serviceDetail),
+})
+}
+
+// GetServiceDetailsByServiceJob retrieves service details by service job ID
+func (h *ServiceHandler) GetServiceDetailsByServiceJob(c *fiber.Ctx) error {
+serviceJobID, err := strconv.ParseUint(c.Params("service_job_id"), 10, 32)
+if err != nil {
+return c.Status(fiber.StatusBadRequest).JSON(responses.Response{
+Status:  "error",
+Message: "Invalid service job ID",
+Error:   err.Error(),
+})
+}
+
+serviceDetails, err := h.usecase.ServiceDetail.GetServiceDetailsByServiceJob(c.Context(), uint(serviceJobID))
+if err != nil {
+return c.Status(fiber.StatusInternalServerError).JSON(responses.Response{
+Status:  "error",
+Message: "Failed to retrieve service details",
+Error:   err.Error(),
+})
+}
+
+var serviceDetailResponses []interface{}
+for _, serviceDetail := range serviceDetails {
+serviceDetailResponses = append(serviceDetailResponses, responses.ToServiceDetailResponse(serviceDetail))
+}
+
+return c.Status(fiber.StatusOK).JSON(responses.Response{
+Status:  "success",
+Message: "Service details retrieved successfully",
+Data:    serviceDetailResponses,
+})
+}
+
+// UpdateServiceDetail updates a service detail
+func (h *ServiceHandler) UpdateServiceDetail(c *fiber.Ctx) error {
+id, err := strconv.ParseUint(c.Params("id"), 10, 32)
+if err != nil {
+return c.Status(fiber.StatusBadRequest).JSON(responses.Response{
+Status:  "error",
+Message: "Invalid service detail ID",
+Error:   err.Error(),
+})
+}
+
+var req interfaces.UpdateServiceDetailRequest
+if err := c.BodyParser(&req); err != nil {
+return c.Status(fiber.StatusBadRequest).JSON(responses.Response{
+Status:  "error",
+Message: "Invalid request body",
+Error:   err.Error(),
+})
+}
+
+serviceDetail, err := h.usecase.ServiceDetail.UpdateServiceDetail(c.Context(), uint(id), req)
+if err != nil {
+return c.Status(fiber.StatusInternalServerError).JSON(responses.Response{
+Status:  "error",
+Message: "Failed to update service detail",
+Error:   err.Error(),
+})
+}
+
+return c.Status(fiber.StatusOK).JSON(responses.Response{
+Status:  "success",
+Message: "Service detail updated successfully",
+Data:    responses.ToServiceDetailResponse(serviceDetail),
+})
+}
+
+// DeleteServiceDetail deletes a service detail
+func (h *ServiceHandler) DeleteServiceDetail(c *fiber.Ctx) error {
+id, err := strconv.ParseUint(c.Params("id"), 10, 32)
+if err != nil {
+return c.Status(fiber.StatusBadRequest).JSON(responses.Response{
+Status:  "error",
+Message: "Invalid service detail ID",
+Error:   err.Error(),
+})
+}
+
+err = h.usecase.ServiceDetail.DeleteServiceDetail(c.Context(), uint(id))
+if err != nil {
+return c.Status(fiber.StatusInternalServerError).JSON(responses.Response{
+Status:  "error",
+Message: "Failed to delete service detail",
+Error:   err.Error(),
+})
+}
+
+return c.Status(fiber.StatusOK).JSON(responses.Response{
+Status:  "success",
+Message: "Service detail deleted successfully",
+})
+}
+
+// ============= Service Job History Handlers =============
+
+// GetServiceJobHistoriesByServiceJob retrieves service job histories by service job ID
+func (h *ServiceHandler) GetServiceJobHistoriesByServiceJob(c *fiber.Ctx) error {
+serviceJobID, err := strconv.ParseUint(c.Params("service_job_id"), 10, 32)
+if err != nil {
+return c.Status(fiber.StatusBadRequest).JSON(responses.Response{
+Status:  "error",
+Message: "Invalid service job ID",
+Error:   err.Error(),
+})
+}
+
+histories, err := h.usecase.ServiceJobHistory.GetServiceJobHistoriesByServiceJob(c.Context(), uint(serviceJobID))
+if err != nil {
+return c.Status(fiber.StatusInternalServerError).JSON(responses.Response{
+Status:  "error",
+Message: "Failed to retrieve service job histories",
+Error:   err.Error(),
+})
+}
+
+var historyResponses []interface{}
+for _, history := range histories {
+historyResponses = append(historyResponses, responses.ToServiceJobHistoryResponse(history))
+}
+
+return c.Status(fiber.StatusOK).JSON(responses.Response{
+Status:  "success",
+Message: "Service job histories retrieved successfully",
+Data:    historyResponses,
+})
+}
+
+// GetServiceJobByServiceCode retrieves a service job by service code
+func (h *ServiceHandler) GetServiceJobByServiceCode(c *fiber.Ctx) error {
+serviceCode := c.Query("service_code")
+if serviceCode == "" {
+return c.Status(fiber.StatusBadRequest).JSON(responses.Response{
+Status:  "error",
+Message: "Service code is required",
+})
+}
+
+serviceJob, err := h.usecase.ServiceJob.GetServiceJobByServiceCode(c.Context(), serviceCode)
+if err != nil {
+return c.Status(fiber.StatusNotFound).JSON(responses.Response{
+Status:  "error",
+Message: "Service job not found",
+Error:   err.Error(),
+})
+}
+
+return c.Status(fiber.StatusOK).JSON(responses.Response{
+Status:  "success",
+Message: "Service job retrieved successfully",
+Data:    responses.ToServiceJobResponse(serviceJob),
+})
+}
+
+// UpdateServiceJobStatus updates service job status and creates history
+func (h *ServiceHandler) UpdateServiceJobStatus(c *fiber.Ctx) error {
+id, err := strconv.ParseUint(c.Params("id"), 10, 32)
+if err != nil {
+return c.Status(fiber.StatusBadRequest).JSON(responses.Response{
+Status:  "error",
+Message: "Invalid service job ID",
+Error:   err.Error(),
+})
+}
+
+var req struct {
+Status string  `json:"status" validate:"required"`
+UserID uint    `json:"user_id" validate:"required"`
+Notes  *string `json:"notes,omitempty"`
+}
+if err := c.BodyParser(&req); err != nil {
+return c.Status(fiber.StatusBadRequest).JSON(responses.Response{
+Status:  "error",
+Message: "Invalid request body",
+Error:   err.Error(),
+})
+}
+
+err = h.usecase.ServiceJob.UpdateServiceJobStatus(c.Context(), uint(id), models.ServiceStatusEnum(req.Status), req.UserID, req.Notes)
+if err != nil {
+return c.Status(fiber.StatusInternalServerError).JSON(responses.Response{
+Status:  "error",
+Message: "Failed to update service job status",
+Error:   err.Error(),
+})
+}
+
+return c.Status(fiber.StatusOK).JSON(responses.Response{
+Status:  "success",
+Message: "Service job status updated successfully",
+})
 }

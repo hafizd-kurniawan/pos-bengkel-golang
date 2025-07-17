@@ -35,4 +35,37 @@ func SetupServiceRoutes(app *fiber.App, usecase *usecase.UsecaseManager) {
 
 	// Category-specific service routes
 	serviceCategories.Get("/:category_id/services", serviceHandler.GetServicesByCategory)
+
+	// ============= Service Job Routes =============
+	
+	// Service Job routes
+	serviceJobs := api.Group("/service-jobs")
+	serviceJobs.Post("/", serviceHandler.CreateServiceJob)
+	serviceJobs.Get("/", serviceHandler.ListServiceJobs)
+	serviceJobs.Get("/service-code", serviceHandler.GetServiceJobByServiceCode)
+	serviceJobs.Get("/status", serviceHandler.GetServiceJobsByStatus)
+	serviceJobs.Get("/:id", serviceHandler.GetServiceJob)
+	serviceJobs.Put("/:id", serviceHandler.UpdateServiceJob)
+	serviceJobs.Put("/:id/status", serviceHandler.UpdateServiceJobStatus)
+	serviceJobs.Delete("/:id", serviceHandler.DeleteServiceJob)
+
+	// Customer-specific service job routes
+	customers := api.Group("/customers")
+	customers.Get("/:customer_id/service-jobs", serviceHandler.GetServiceJobsByCustomer)
+
+	// ============= Service Detail Routes =============
+	
+	// Service Detail routes
+	serviceDetails := api.Group("/service-details")
+	serviceDetails.Post("/", serviceHandler.CreateServiceDetail)
+	serviceDetails.Put("/:id", serviceHandler.UpdateServiceDetail)
+	serviceDetails.Delete("/:id", serviceHandler.DeleteServiceDetail)
+
+	// Service job specific service details
+	serviceJobs.Get("/:service_job_id/details", serviceHandler.GetServiceDetailsByServiceJob)
+
+	// ============= Service Job History Routes =============
+	
+	// Service job specific histories
+	serviceJobs.Get("/:service_job_id/histories", serviceHandler.GetServiceJobHistoriesByServiceJob)
 }

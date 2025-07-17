@@ -12,6 +12,7 @@ import (
 	"boilerplate/pkg/infra/db"
 	"fmt"
 	"log"
+	"time"
 	
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html"
@@ -49,6 +50,15 @@ func Run(conf *config.Config, dbList *db.DatabaseList, appLoger *logrus.Logger) 
 	
 	// Setup new routes
 	routes.SetupFoundationRoutes(app, usecaseManager)
+	
+	// Health check endpoint
+	app.Get("/health", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{
+			"status": "ok",
+			"message": "POS Bengkel API is running",
+			"timestamp": time.Now(),
+		})
+	})
 
 	//* Initial Old Wrapper (for compatibility)
 

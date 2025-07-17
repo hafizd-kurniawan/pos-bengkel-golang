@@ -211,3 +211,160 @@ func (u *OutletUsecaseImpl) ListOutlets(ctx context.Context, limit, offset int) 
 func (u *OutletUsecaseImpl) GetActiveOutlets(ctx context.Context) ([]*models.Outlet, error) {
 	return u.repo.Outlet.GetByStatus(ctx, models.StatusAktif)
 }
+// RoleUsecaseImpl implements RoleUsecase interface  
+type RoleUsecaseImpl struct {
+repo *repository.RepositoryManager
+}
+
+// NewRoleUsecase creates a new role usecase
+func NewRoleUsecase(repo *repository.RepositoryManager) interfaces.RoleUsecase {
+return &RoleUsecaseImpl{repo: repo}
+}
+
+func (u *RoleUsecaseImpl) CreateRole(ctx context.Context, req interfaces.CreateRoleRequest) (*models.Role, error) {
+// Check if role name already exists
+existingRole, err := u.repo.Role.GetByName(ctx, req.Name)
+if err == nil && existingRole != nil {
+return nil, errors.New("role with this name already exists")
+}
+
+role := &models.Role{
+Name:      req.Name,
+CreatedAt: time.Now(),
+UpdatedAt: time.Now(),
+}
+
+err = u.repo.Role.Create(ctx, role)
+if err != nil {
+return nil, err
+}
+
+return role, nil
+}
+
+func (u *RoleUsecaseImpl) GetRole(ctx context.Context, id uint) (*models.Role, error) {
+return u.repo.Role.GetByID(ctx, id)
+}
+
+func (u *RoleUsecaseImpl) GetRoleByName(ctx context.Context, name string) (*models.Role, error) {
+return u.repo.Role.GetByName(ctx, name)
+}
+
+func (u *RoleUsecaseImpl) UpdateRole(ctx context.Context, id uint, req interfaces.UpdateRoleRequest) (*models.Role, error) {
+role, err := u.repo.Role.GetByID(ctx, id)
+if err != nil {
+return nil, err
+}
+
+if req.Name != nil {
+// Check if new name already exists
+existingRole, err := u.repo.Role.GetByName(ctx, *req.Name)
+if err == nil && existingRole != nil && existingRole.ID != id {
+return nil, errors.New("role with this name already exists")
+}
+role.Name = *req.Name
+}
+
+role.UpdatedAt = time.Now()
+
+err = u.repo.Role.Update(ctx, role)
+if err != nil {
+return nil, err
+}
+
+return role, nil
+}
+
+func (u *RoleUsecaseImpl) DeleteRole(ctx context.Context, id uint) error {
+return u.repo.Role.Delete(ctx, id)
+}
+
+func (u *RoleUsecaseImpl) ListRoles(ctx context.Context, limit, offset int) ([]*models.Role, error) {
+return u.repo.Role.List(ctx, limit, offset)
+}
+
+func (u *RoleUsecaseImpl) AttachPermissions(ctx context.Context, roleID uint, permissionIDs []uint) error {
+	return u.repo.Role.AttachPermissions(ctx, roleID, permissionIDs)
+}
+
+func (u *RoleUsecaseImpl) DetachPermissions(ctx context.Context, roleID uint, permissionIDs []uint) error {
+	return u.repo.Role.DetachPermissions(ctx, roleID, permissionIDs)
+}
+
+// PermissionUsecaseImpl implements PermissionUsecase interface
+type PermissionUsecaseImpl struct {
+repo *repository.RepositoryManager
+}
+
+// NewPermissionUsecase creates a new permission usecase
+func NewPermissionUsecase(repo *repository.RepositoryManager) interfaces.PermissionUsecase {
+return &PermissionUsecaseImpl{repo: repo}
+}
+
+func (u *PermissionUsecaseImpl) CreatePermission(ctx context.Context, req interfaces.CreatePermissionRequest) (*models.Permission, error) {
+// Check if permission name already exists
+existingPermission, err := u.repo.Permission.GetByName(ctx, req.Name)
+if err == nil && existingPermission != nil {
+return nil, errors.New("permission with this name already exists")
+}
+
+permission := &models.Permission{
+Name:      req.Name,
+CreatedAt: time.Now(),
+UpdatedAt: time.Now(),
+}
+
+err = u.repo.Permission.Create(ctx, permission)
+if err != nil {
+return nil, err
+}
+
+return permission, nil
+}
+
+func (u *PermissionUsecaseImpl) GetPermission(ctx context.Context, id uint) (*models.Permission, error) {
+return u.repo.Permission.GetByID(ctx, id)
+}
+
+func (u *PermissionUsecaseImpl) GetPermissionByName(ctx context.Context, name string) (*models.Permission, error) {
+return u.repo.Permission.GetByName(ctx, name)
+}
+
+func (u *PermissionUsecaseImpl) UpdatePermission(ctx context.Context, id uint, req interfaces.UpdatePermissionRequest) (*models.Permission, error) {
+permission, err := u.repo.Permission.GetByID(ctx, id)
+if err != nil {
+return nil, err
+}
+
+if req.Name != nil {
+// Check if new name already exists
+existingPermission, err := u.repo.Permission.GetByName(ctx, *req.Name)
+if err == nil && existingPermission != nil && existingPermission.ID != id {
+return nil, errors.New("permission with this name already exists")
+}
+permission.Name = *req.Name
+}
+
+permission.UpdatedAt = time.Now()
+
+err = u.repo.Permission.Update(ctx, permission)
+if err != nil {
+return nil, err
+}
+
+return permission, nil
+}
+
+func (u *PermissionUsecaseImpl) DeletePermission(ctx context.Context, id uint) error {
+return u.repo.Permission.Delete(ctx, id)
+}
+
+func (u *PermissionUsecaseImpl) ListPermissions(ctx context.Context, limit, offset int) ([]*models.Permission, error) {
+return u.repo.Permission.List(ctx, limit, offset)
+}
+
+
+
+func (u *PermissionUsecaseImpl) GetPermissionsByRole(ctx context.Context, roleID uint) ([]*models.Permission, error) {
+return u.repo.Permission.GetByRoleID(ctx, roleID)
+}

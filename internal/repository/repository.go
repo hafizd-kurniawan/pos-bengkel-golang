@@ -115,9 +115,9 @@ func NewSQLXRepositoryManager(db *sqlx.DB, gormDB *gorm.DB) *RepositoryManager {
 		Supplier:            implementations.NewSupplierRepository(gormDB),
 		UnitType:            implementations.NewUnitTypeRepository(gormDB),
 
-		// Services (using GORM for now)
-		Service:           implementations.NewServiceRepository(gormDB),
-		ServiceCategory:   implementations.NewServiceCategoryRepository(gormDB),
+		// Services (converted to SQLx)
+		Service:           implementations.NewServiceRepositorySQLX(db),
+		ServiceCategory:   implementations.NewServiceCategoryRepositorySQLX(db),
 		ServiceJob:        implementations.NewServiceJobRepository(gormDB),
 		ServiceDetail:     implementations.NewServiceDetailRepository(gormDB),
 		ServiceJobHistory: implementations.NewServiceJobHistoryRepository(gormDB),

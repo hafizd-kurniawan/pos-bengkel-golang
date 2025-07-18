@@ -34,13 +34,19 @@ func main() {
 
 	var dbList db.DatabaseList
 	dbList.DatabaseApp = db.NewGORMConnection(&conf.Connection.DatabaseApp, appLogger)
+	dbList.SQLXApp = db.NewSQLXConnection(&conf.Connection.DatabaseApp, appLogger)
 	//? Wab Fondasi Mongo DB
 
 	//* ====================== Run Migrations ======================
 	
 	err := db.RunMigrations(dbList.DatabaseApp)
 	if err != nil {
-		appLogger.Fatalf("Failed to run migrations: %v", err)
+		appLogger.Fatalf("Failed to run GORM migrations: %v", err)
+	}
+
+	err = db.RunSQLXMigrations(dbList.SQLXApp.GetDB())
+	if err != nil {
+		appLogger.Fatalf("Failed to run SQLx migrations: %v", err)
 	}
 
 	//* ====================== Running Server ======================

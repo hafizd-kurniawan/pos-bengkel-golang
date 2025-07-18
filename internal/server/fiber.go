@@ -42,8 +42,8 @@ func Run(conf *config.Config, dbList *db.DatabaseList, appLoger *logrus.Logger) 
 
 	//* Initial New Architecture (Repository -> Usecase -> Handler)
 	
-	// Initialize new repository manager
-	repoManager := repository.NewRepositoryManager(dbList.DatabaseApp)
+	// Initialize new SQLx repository manager
+	repoManager := repository.NewSQLXRepositoryManager(dbList.SQLXApp.GetDB(), dbList.DatabaseApp)
 	
 	// Initialize new usecase manager
 	usecaseManager := usecase.NewUsecaseManager(repoManager)

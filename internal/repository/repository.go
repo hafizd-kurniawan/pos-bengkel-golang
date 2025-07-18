@@ -4,6 +4,7 @@ import (
 	"boilerplate/internal/repository/implementations"
 	"boilerplate/internal/repository/interfaces"
 
+	"github.com/jmoiron/sqlx"
 	"gorm.io/gorm"
 )
 
@@ -64,8 +65,8 @@ func NewRepositoryManager(db *gorm.DB) *RepositoryManager {
 		Permission: implementations.NewPermissionRepository(db),
 
 		// Customer & Vehicle
-		Customer:        implementations.NewCustomerRepository(db),
-		CustomerVehicle: implementations.NewCustomerVehicleRepository(db),
+		Customer:        implementations.NewCustomerRepositoryGORM(db),
+		CustomerVehicle: implementations.NewCustomerVehicleRepositoryGORM(db),
 
 		// Master Data & Inventory
 		Product:             implementations.NewProductRepository(db),
@@ -91,5 +92,43 @@ func NewRepositoryManager(db *gorm.DB) *RepositoryManager {
 		CashFlow:            implementations.NewCashFlowRepository(db),
 
 		// Add other repositories as they are implemented
+	}
+}
+
+// NewSQLXRepositoryManager creates a new repository manager with SQLx repositories
+func NewSQLXRepositoryManager(db *sqlx.DB, gormDB *gorm.DB) *RepositoryManager {
+	return &RepositoryManager{
+		// Foundation & Security (using GORM for now)
+		User:       implementations.NewUserRepository(gormDB),
+		Outlet:     implementations.NewOutletRepository(gormDB),
+		Role:       implementations.NewRoleRepository(gormDB),
+		Permission: implementations.NewPermissionRepository(gormDB),
+
+		// Customer & Vehicle (converted to SQLx)
+		Customer:        implementations.NewCustomerRepository(db),
+		CustomerVehicle: implementations.NewCustomerVehicleRepository(db),
+
+		// Master Data & Inventory (using GORM for now)
+		Product:             implementations.NewProductRepository(gormDB),
+		ProductSerialNumber: implementations.NewProductSerialNumberRepository(gormDB),
+		Category:            implementations.NewCategoryRepository(gormDB),
+		Supplier:            implementations.NewSupplierRepository(gormDB),
+		UnitType:            implementations.NewUnitTypeRepository(gormDB),
+
+		// Services (using GORM for now)
+		Service:           implementations.NewServiceRepository(gormDB),
+		ServiceCategory:   implementations.NewServiceCategoryRepository(gormDB),
+		ServiceJob:        implementations.NewServiceJobRepository(gormDB),
+		ServiceDetail:     implementations.NewServiceDetailRepository(gormDB),
+		ServiceJobHistory: implementations.NewServiceJobHistoryRepository(gormDB),
+
+		// Transactions (using GORM for now)
+		Transaction:           implementations.NewTransactionRepository(gormDB),
+		TransactionDetail:     implementations.NewTransactionDetailRepository(gormDB),
+
+		// Financial (using GORM for now)
+		PaymentMethod:       implementations.NewPaymentMethodRepository(gormDB),
+		Payment:             implementations.NewPaymentRepository(gormDB),
+		CashFlow:            implementations.NewCashFlowRepository(gormDB),
 	}
 }

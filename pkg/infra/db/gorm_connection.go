@@ -13,6 +13,7 @@ import (
 
 type DatabaseList struct {
 	DatabaseApp *gorm.DB
+	SQLXApp     *SQLXDatabase
 }
 
 func NewGORMConnection(conf *config.DatabaseAccount, log *logrus.Logger) *gorm.DB {

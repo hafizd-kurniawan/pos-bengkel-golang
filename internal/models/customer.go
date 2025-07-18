@@ -1,45 +1,61 @@
 package models
 
 import (
+	"database/sql/driver"
 	"time"
-
-	"gorm.io/gorm"
 )
 
 // Customers table
 type Customer struct {
-	CustomerID  uint           `gorm:"primaryKey;autoIncrement" json:"customer_id"`
-	Name        string         `gorm:"size:255;not null" json:"name"`
-	PhoneNumber string         `gorm:"size:20;unique;not null" json:"phone_number"`
-	Address     *string        `gorm:"type:text" json:"address"`
-	Status      StatusUmum     `gorm:"not null;default:'Aktif'" json:"status"`
-	CreatedAt   time.Time      `json:"created_at"`
-	UpdatedAt   time.Time      `json:"updated_at"`
-	DeletedAt   gorm.DeletedAt `gorm:"index" json:"deleted_at"`
-	CreatedBy   *uint          `json:"created_by"`
+	CustomerID  uint       `db:"customer_id" json:"customer_id"`
+	Name        string     `db:"name" json:"name"`
+	PhoneNumber string     `db:"phone_number" json:"phone_number"`
+	Address     *string    `db:"address" json:"address"`
+	Status      StatusUmum `db:"status" json:"status"`
+	CreatedAt   time.Time  `db:"created_at" json:"created_at"`
+	UpdatedAt   time.Time  `db:"updated_at" json:"updated_at"`
+	DeletedAt   *time.Time `db:"deleted_at" json:"deleted_at"`
+	CreatedBy   *uint      `db:"created_by" json:"created_by"`
 
-	// Relationships
-	Vehicles []CustomerVehicle `gorm:"foreignKey:CustomerID" json:"vehicles,omitempty"`
+	// Relationships (populated separately)
+	Vehicles []CustomerVehicle `json:"vehicles,omitempty"`
 }
 
 // CustomerVehicles table
 type CustomerVehicle struct {
-	VehicleID      uint           `gorm:"primaryKey;autoIncrement" json:"vehicle_id"`
-	CustomerID     uint           `gorm:"not null;index" json:"customer_id"`
-	PlateNumber    string         `gorm:"size:20;unique;not null" json:"plate_number"`
-	Brand          string         `gorm:"size:100;not null" json:"brand"`
-	Model          string         `gorm:"size:100;not null" json:"model"`
-	Type           string         `gorm:"size:100;not null" json:"type"`
-	ProductionYear int            `gorm:"not null" json:"production_year"`
-	ChassisNumber  string         `gorm:"size:100;unique;not null" json:"chassis_number"`
-	EngineNumber   string         `gorm:"size:100;unique;not null" json:"engine_number"`
-	Color          string         `gorm:"size:50;not null" json:"color"`
-	Notes          *string        `gorm:"type:text" json:"notes"`
-	CreatedAt      time.Time      `json:"created_at"`
-	UpdatedAt      time.Time      `json:"updated_at"`
-	DeletedAt      gorm.DeletedAt `gorm:"index" json:"deleted_at"`
-	CreatedBy      *uint          `json:"created_by"`
+	VehicleID      uint       `db:"vehicle_id" json:"vehicle_id"`
+	CustomerID     uint       `db:"customer_id" json:"customer_id"`
+	PlateNumber    string     `db:"plate_number" json:"plate_number"`
+	Brand          string     `db:"brand" json:"brand"`
+	Model          string     `db:"model" json:"model"`
+	Type           string     `db:"type" json:"type"`
+	ProductionYear int        `db:"production_year" json:"production_year"`
+	ChassisNumber  string     `db:"chassis_number" json:"chassis_number"`
+	EngineNumber   string     `db:"engine_number" json:"engine_number"`
+	Color          string     `db:"color" json:"color"`
+	Notes          *string    `db:"notes" json:"notes"`
+	CreatedAt      time.Time  `db:"created_at" json:"created_at"`
+	UpdatedAt      time.Time  `db:"updated_at" json:"updated_at"`
+	DeletedAt      *time.Time `db:"deleted_at" json:"deleted_at"`
+	CreatedBy      *uint      `db:"created_by" json:"created_by"`
 
-	// Relationships
-	Customer *Customer `gorm:"foreignKey:CustomerID" json:"customer,omitempty"`
+	// Relationships (populated separately)
+	Customer *Customer `json:"customer,omitempty"`
+}
+
+// Implement database/sql interfaces for StatusUmum
+func (s *StatusUmum) Scan(value interface{}) error {
+	if value == nil {
+		*s = ""
+		return nil
+	}
+	if str, ok := value.(string); ok {
+		*s = StatusUmum(str)
+		return nil
+	}
+	return nil
+}
+
+func (s StatusUmum) Value() (driver.Value, error) {
+	return string(s), nil
 }

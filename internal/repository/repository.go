@@ -98,20 +98,20 @@ func NewRepositoryManager(db *gorm.DB) *RepositoryManager {
 // NewSQLXRepositoryManager creates a new repository manager with SQLx repositories
 func NewSQLXRepositoryManager(db *sqlx.DB, gormDB *gorm.DB) *RepositoryManager {
 	return &RepositoryManager{
-		// Foundation & Security (using GORM for now)
-		User:       implementations.NewUserRepository(gormDB),
-		Outlet:     implementations.NewOutletRepository(gormDB),
-		Role:       implementations.NewRoleRepository(gormDB),
-		Permission: implementations.NewPermissionRepository(gormDB),
+		// Foundation & Security (converted to SQLx)
+		User:       implementations.NewUserRepositorySQLX(db),
+		Outlet:     implementations.NewOutletRepositorySQLX(db),
+		Role:       implementations.NewRoleRepositorySQLX(db),
+		Permission: implementations.NewPermissionRepositorySQLX(db),
 
 		// Customer & Vehicle (converted to SQLx)
 		Customer:        implementations.NewCustomerRepository(db),
 		CustomerVehicle: implementations.NewCustomerVehicleRepository(db),
 
-		// Master Data & Inventory (using GORM for now)
-		Product:             implementations.NewProductRepository(gormDB),
+		// Master Data & Inventory (converted to SQLx)
+		Product:             implementations.NewProductRepositorySQLX(db),
 		ProductSerialNumber: implementations.NewProductSerialNumberRepository(gormDB),
-		Category:            implementations.NewCategoryRepository(gormDB),
+		Category:            implementations.NewCategoryRepositorySQLX(db),
 		Supplier:            implementations.NewSupplierRepository(gormDB),
 		UnitType:            implementations.NewUnitTypeRepository(gormDB),
 

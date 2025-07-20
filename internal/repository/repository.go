@@ -18,6 +18,15 @@ type RepositoryManager struct {
 	// Customer & Vehicle
 	Customer        interfaces.CustomerRepository
 	CustomerVehicle interfaces.CustomerVehicleRepository
+	
+	// Vehicle Trading
+	Vehicle                     interfaces.VehicleRepository
+	VehiclePurchaseTransaction  interfaces.VehiclePurchaseTransactionRepository
+	VehicleReconditioningJob    interfaces.VehicleReconditioningJobRepository
+	ReconditioningDetail        interfaces.ReconditioningDetailRepository
+	VehicleSalesTransaction     interfaces.VehicleSalesTransactionRepository
+	VehicleInstallment          interfaces.VehicleInstallmentRepository
+	InstallmentPayment          interfaces.InstallmentPaymentRepository
 
 	// Master Data & Inventory
 	Product             interfaces.ProductRepository
@@ -66,6 +75,15 @@ func NewRepositoryManager(db *gorm.DB) *RepositoryManager {
 		// Customer & Vehicle
 		Customer:        implementations.NewCustomerRepository(db),
 		CustomerVehicle: implementations.NewCustomerVehicleRepository(db),
+		
+		// Vehicle Trading
+		Vehicle:                     implementations.NewVehicleRepository(db),
+		VehiclePurchaseTransaction:  implementations.NewVehiclePurchaseTransactionRepository(db),
+		VehicleReconditioningJob:    implementations.NewVehicleReconditioningJobRepository(db),
+		ReconditioningDetail:        implementations.NewReconditioningDetailRepository(db),
+		VehicleSalesTransaction:     implementations.NewVehicleSalesTransactionRepository(db),
+		VehicleInstallment:          implementations.NewVehicleInstallmentRepository(db),
+		InstallmentPayment:          implementations.NewInstallmentPaymentRepository(db),
 
 		// Master Data & Inventory
 		Product:             implementations.NewProductRepository(db),
